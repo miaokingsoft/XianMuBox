@@ -1,0 +1,5 @@
+# Release build output
+_release/
+
+# VS Code editor settings
+.vscode/
