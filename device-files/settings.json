@@ -1,0 +1,72 @@
+{
+    "wifi": [],
+    "alarms": [],
+    "swipe": {
+        "mode_idx": 0,
+        "active_device_idx": 0,
+        "modes": [
+            {
+                "name": "刷新视频-上滑",
+                "interval_max": 20,
+                "interval_min": 10,
+                "swipe_offset_ratio": 3,
+                "swipe_delay_ms": 30,
+                "swipe_steps": 6
+            },
+            {
+                "name": "刷新视频-下滑",
+                "interval_max": 20,
+                "interval_min": 10,
+                "swipe_offset_ratio": 6,
+                "swipe_delay_ms": 20,
+                "swipe_steps": 5
+            },
+            {
+                "name": "看书-左滑",
+                "interval_max": 20,
+                "interval_min": 10,
+                "swipe_offset_ratio": 3,
+                "swipe_delay_ms": 20,
+                "swipe_steps": 5
+            },
+            {
+                "name": "看书-右滑",
+                "interval_max": 20,
+                "interval_min": 10,
+                "swipe_offset_ratio": 6,
+                "swipe_delay_ms": 20,
+                "swipe_steps": 5
+            }
+        ],
+        "devices": [
+            {
+                "screen_w": 1080,
+                "name": "Phone",
+                "screen_h": 1920
+            },
+            {
+                "screen_w": 1080,
+                "name": "XiaoMi",
+                "screen_h": 2340
+            }
+        ]
+    },
+    "api_keys": {},
+    "brightness": 100,
+    "http_port": 80,
+    "api_keys_hidden": [],
+    "project": {
+        "own_sites": [],
+        "ai_token": "",
+        "self_media": [],
+        "device_sn": ""
+    },
+    "stock": {
+        "endpoint": "",
+        "api_key": ""
+    },
+    "weather": {
+        "city": "",
+        "api_key": ""
+    }
+}

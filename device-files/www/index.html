@@ -1,0 +1,2590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+   <meta name="theme-color" content="#0a0e1b">
+   <title>闲沐盒子配置</title>
+   <style>
+/* ============ 设计令牌 ============ */
+:root { --bg:#0b0f1c; --panel:#121a2e; --panel-2:#1a2440; --line:#273352; --line-soft:#1c2540; --text:#e7ecf6;
+   --muted:#93a0bd; --faint:#5e6b8b; --accent:#2fd4f0; --accent-press:#1fb6d4; --add:#2f9e5f; --ok:#43d17c;
+   --err:#f87171; --warn:#fbbf24; --r-lg:16px; --r-md:12px; --r-sm:9px;
+   --mono:ui-monospace,SFMono-Regular,Consolas,"Courier New",monospace;
+   --shadow-card:0 10px 28px -14px rgba(3,8,22,.9) }
+* { box-sizing:border-box }
+html { color-scheme:dark; scroll-behavior:smooth }
+html,body { margin:0; padding:0; background:var(--bg); color:var(--text);
+   font-family:system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;
+   -webkit-text-size-adjust:100%%; overscroll-behavior:contain }
+body { display:flex; justify-content:center; min-height:100vh; min-height:100dvh;
+   background:radial-gradient(900px 420px at 50%% -80px,rgba(47,212,240,.06),transparent 70%%),var(--bg) }
+.wrap { width:100%%; max-width:720px; padding-bottom:env(safe-area-inset-bottom) }
+::selection { background:rgba(47,212,240,.3) }
+::-webkit-scrollbar { width:5px; height:5px }
+::-webkit-scrollbar-thumb { background:var(--line); border-radius:999px }
+::-webkit-scrollbar-track { background:transparent }
+/* ============ 页头 ============ */
+h1 { margin:20px 0 6px; font-size:1.28em; font-weight:700; text-align:center; letter-spacing:.03em;
+   background:linear-gradient(115deg,#f4f7ff 25%%,var(--accent) 95%%); -webkit-background-clip:text;
+   background-clip:text; -webkit-text-fill-color:transparent; color:var(--text) }
+h1::after { content:'XIANMUBOX · 设备配置中心'; display:block; margin-top:5px; font-size:.5em; font-weight:500;
+   letter-spacing:.4em; text-indent:.4em; background:none; color:var(--faint); -webkit-text-fill-color:var(--faint) }
+/* ============ 页签栏 (胶囊 · 可滚动 · 毛玻璃) ============ */
+header.tabs { position:sticky; top:0; z-index:20; display:flex; gap:3px; padding:10px 10px;
+   background:rgba(10,14,27,.85); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px);
+   border-bottom:1px solid var(--line-soft); overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
+   scroll-snap-type:x proximity }
+header.tabs::-webkit-scrollbar { display:none }
+header.tabs .tab { flex:1 0 auto; min-height:36px; padding:7px 10px; background:rgba(255,255,255,.035);
+   color:var(--muted); border:1px solid var(--line); border-radius:999px; font-size:13px; line-height:1.2;
+   text-align:center; cursor:pointer; user-select:none; white-space:nowrap; scroll-snap-align:center;
+   -webkit-tap-highlight-color:transparent; transition:color .15s,background .15s,border-color .15s }
+header.tabs .tab:active { background:rgba(255,255,255,.07) }
+header.tabs .tab.active { color:var(--accent); border-color:rgba(47,212,240,.45);
+   background:linear-gradient(150deg,rgba(47,212,240,.17),rgba(61,123,255,.1)); font-weight:600;
+   box-shadow:0 0 14px -2px rgba(47,212,240,.25) }
+@media (hover:hover) {
+   header.tabs .tab:hover { color:var(--text); border-color:var(--line) }
+   header.tabs .tab.active:hover { color:var(--accent); border-color:rgba(47,212,240,.55) }
+}
+/* ============ 分区 ============ */
+section.section { display:none; padding:14px 14px 4px }
+section.section.active { display:block }
+section h2 { display:flex; align-items:center; gap:8px; margin:16px 2px 12px; color:var(--text); font-size:.95em;
+   font-weight:600; letter-spacing:.03em }
+section h2::before { content:''; flex:0 0 4px; height:13px; border-radius:2px;
+   background:linear-gradient(180deg,var(--accent),#3d7bff) }
+section h2:first-child { margin-top:6px }
+label { display:block; margin:0 0 6px; font-size:.8em; color:var(--muted); letter-spacing:.02em }
+/* ============ 表单控件 ============ */
+input,select { width:100%%; height:40px; padding:0 12px; background:var(--panel-2); color:var(--text);
+   border:1px solid var(--line); border-radius:10px; font-size:14px; font-family:inherit; outline:none;
+   transition:border-color .15s,background .15s,box-shadow .15s }
+input { font-variant-numeric:tabular-nums }
+input:focus,select:focus { border-color:var(--accent); background:rgba(47,212,240,.05);
+   box-shadow:0 0 0 3px rgba(47,212,240,.14) }
+input::placeholder { color:var(--faint) }
+select { -webkit-appearance:none; appearance:none; padding-right:30px;
+   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='rgb(147,160,189)' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+   background-repeat:no-repeat; background-position:right 11px center }
+select,option { color:var(--text) !important; background-color:var(--panel) !important }
+input[type='number']::-webkit-inner-spin-button,input[type='number']::-webkit-outer-spin-button { -webkit-appearance:none;
+   margin:0 }
+input[type='number'] { -moz-appearance:textfield; appearance:textfield }
+input[readonly] { background:rgba(255,255,255,.03); color:var(--muted); cursor:default }
+#weather-current { line-height:1.75 }
+/* ============ 按钮体系 ============ */
+button { font-family:inherit }
+button:focus-visible,summary:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
+button.primary { display:block; width:100%%; height:46px; margin-top:14px; border:none; border-radius:12px;
+   background:linear-gradient(135deg,#35d6f2,#3d7bff); color:#051321; font-size:1em; font-weight:700;
+   letter-spacing:.08em; cursor:pointer; box-shadow:0 8px 22px -8px rgba(47,212,240,.5);
+   transition:filter .15s,transform .12s }
+button.primary:active { transform:translateY(1px); filter:brightness(1.06) }
+button.primary:disabled { opacity:.55; cursor:not-allowed; box-shadow:none }
+button.add-btn { display:inline-block; min-height:36px; padding:7px 14px; background:rgba(56,197,122,.13);
+   color:#56cf87; border:1px solid rgba(56,197,122,.35); border-radius:10px; font-size:13px; font-weight:500;
+   cursor:pointer; transition:background .15s,transform .12s }
+button.add-btn:active { transform:translateY(1px); background:rgba(56,197,122,.22) }
+button.add-btn:disabled { opacity:.45; cursor:not-allowed }
+button.add-btn.btn-neutral { background:rgba(255,255,255,.05); border-color:var(--line); color:var(--muted) }
+button.add-btn.btn-neutral:active { background:rgba(255,255,255,.09) }
+@media (hover:hover) {
+   button.primary:hover { filter:brightness(1.06) }
+   button.add-btn:hover { background:rgba(56,197,122,.2) }
+}
+.hint { color:var(--muted); font-size:.78em; margin:6px 0 4px; line-height:1.55 }
+.hint a { color:var(--accent); text-decoration:none; border-bottom:1px dotted rgba(47,212,240,.4) }
+/* ============ 开关 (统一 44x24) ============ */
+.switch { position:relative; display:inline-block; width:44px; height:24px; flex:0 0 44px; cursor:pointer }
+.switch input { opacity:0; width:0; height:0 }
+.switch .slider { position:absolute; inset:0; background:var(--line); border-radius:999px; transition:background .2s }
+.switch .slider::before { content:''; position:absolute; width:18px; height:18px; left:3px; top:3px; background:#fff;
+   border-radius:50%%; box-shadow:0 1px 3px rgba(0,0,0,.4); transition:transform .2s }
+.switch input:checked+.slider { background:linear-gradient(135deg,#35d6f2,#3d7bff) }
+.switch input:checked+.slider::before { transform:translateX(20px) }
+/* ============ WiFi / 密钥行 (内嵌条目卡) ============ */
+.wifi-row,.key-row { display:flex; gap:6px; margin-bottom:8px; padding:8px; align-items:center;
+   background:rgba(255,255,255,.028); border:1px solid var(--line-soft); border-radius:var(--r-md);
+   transition:border-color .15s }
+.wifi-row:focus-within,.key-row:focus-within { border-color:rgba(47,212,240,.35) }
+.wifi-row input,.key-row input { height:36px; background:transparent; border-color:transparent; font-size:13.5px }
+.wifi-row input:focus,.key-row input:focus { box-shadow:none; background:rgba(47,212,240,.06);
+   border-color:transparent }
+.wifi-row .ssid,.wifi-row .pwd { flex:1; min-width:0 }
+.wifi-row .del,.key-row .del { flex:0 0 38px; width:38px; height:38px; padding:0; background:var(--add); color:#fff;
+   border:none; border-radius:10px; font-size:15px; line-height:1; cursor:pointer; white-space:nowrap;
+   transition:transform .12s }
+.wifi-row .del:active,.key-row .del:active { transform:translateY(1px) }
+.key-row input.lbl { flex:0 0 82px; font-size:12.5px }
+.key-row input.k { flex:1; min-width:0; font-family:var(--mono); letter-spacing:.02em }
+.key-row .eye-btn { flex:0 0 38px; height:38px; padding:0; display:flex; align-items:center; justify-content:center;
+   background:transparent; color:var(--faint); border:1px solid var(--line-soft); border-radius:10px; cursor:pointer;
+   transition:color .15s,border-color .15s }
+.key-row .eye-btn svg { width:16px; height:16px }
+.key-row .eye-btn.on { color:var(--accent); border-color:rgba(47,212,240,.4) }
+/* ============ 密钥分组 (details) ============ */
+.group { background:var(--panel); border:1px solid var(--line); border-radius:var(--r-md); margin-bottom:10px;
+   overflow:hidden; box-shadow:var(--shadow-card) }
+.group>summary { padding:11px 12px; min-height:54px; display:flex; justify-content:space-between; align-items:center;
+   gap:8px; list-style:none; cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent }
+.group>summary::-webkit-details-marker { display:none }
+.group>summary .prov-head { display:flex; align-items:center; gap:9px; min-width:0 }
+.group>summary .prov-avatar { flex:0 0 28px; height:28px; display:flex; align-items:center; justify-content:center;
+   border-radius:var(--r-sm); font-size:.78em; font-weight:700; text-transform:uppercase }
+.group>summary .prov-name { color:var(--text); font-size:.92em; font-weight:600; overflow:hidden;
+   text-overflow:ellipsis; white-space:nowrap }
+.group>summary .prov-disp { color:var(--faint); font-size:.76em; white-space:nowrap }
+.group>summary .badge { background:rgba(47,212,240,.1); color:var(--accent); border:1px solid rgba(47,212,240,.35);
+   border-radius:999px; padding:2px 9px; font-size:.72em; margin-left:6px; white-space:nowrap }
+.group>summary .prov-actions { display:flex; align-items:center; gap:6px }
+.group>summary .switch { flex:0 0 44px }
+.group>summary .arrow { flex:0 0 12px; color:var(--faint); font-size:.75em; transition:transform .18s }
+.group[open]>summary .arrow { transform:rotate(90deg) }
+.group.off { opacity:.55 }
+.group.off>summary .badge { background:none; color:var(--muted); border-color:var(--line) }
+.group.off>summary .prov-avatar { filter:grayscale(.9) }
+.group.off .key-row input { background:rgba(0,0,0,.18) }
+.group .body { padding:10px; border-top:1px solid var(--line-soft) }
+.prov-del { flex:0 0 32px; width:32px; height:32px; padding:0; background:transparent; color:var(--err);
+   border:1px solid rgba(248,113,113,.45); border-radius:var(--r-sm); font-size:.9em; line-height:1; cursor:pointer;
+   white-space:nowrap; transition:background .15s }
+.prov-del:active { background:rgba(248,113,113,.15) }
+/* 删除确认态: 红色胶囊自适应宽度 (通用 .del 与 .prov-del 均生效) */
+button.del.confirming,
+button.prov-del.confirming {
+   flex:0 0 auto;
+   width:auto;
+   min-width:58px;
+   padding:0 12px;
+   background:var(--err);
+   color:#fff;
+   border-color:var(--err);
+   border-radius:999px;
+   font-size:12.5px;
+   font-weight:600;
+   line-height:1;
+   display:inline-flex;
+   align-items:center;
+   justify-content:center;
+   white-space:nowrap;
+   transition:background .15s,color .15s,border-color .15s
+}
+button.del.confirming:active,
+button.prov-del.confirming:active { background:#e05252 }
+.inline-form { display:none; align-items:center; gap:6px; margin-top:8px; flex-wrap:wrap }
+.inline-form input { flex:1; min-width:160px }
+/* ============ 余额卡片 ============ */
+.bcard { background:rgba(255,255,255,.028); border:1px solid var(--line-soft); border-radius:var(--r-md);
+   padding:12px 14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center }
+.bcard .left,.bcard .right { display:flex; flex-direction:column; gap:3px }
+.bcard .right { text-align:right; align-items:flex-end }
+.bcard .lbl { color:var(--faint); font-size:.76em }
+.bcard .prov { color:var(--text); font-size:.9em; font-weight:600 }
+.bcard .prov-dot { display:inline-block; width:8px; height:8px; border-radius:3px; margin-right:7px }
+.bcard .amt { font-size:1.2em; font-weight:700; font-variant-numeric:tabular-nums }
+.bcard .amt.ok { color:var(--accent) }
+.bcard .amt.warn { color:var(--warn) }
+.bcard .amt.danger,.bcard .amt.err { color:var(--err) }
+.bcard .st { font-size:.7em; color:var(--faint) }
+/* ============ 空状态 ============ */
+.empty { color:var(--faint); text-align:center; padding:26px 14px; font-size:.85em; border:1px dashed var(--line);
+   border-radius:var(--r-md); background:rgba(255,255,255,.015) }
+.proj-empty { text-align:center; padding:22px 12px; color:var(--faint); font-size:.85em;
+   border:1px dashed var(--line); border-radius:var(--r-md); background:rgba(255,255,255,.015) }
+.proj-empty .add-btn { margin-top:12px }
+.proj-test-out { flex:1; min-width:0; font-family:var(--mono); font-size:12px; color:var(--muted);
+   white-space:pre-wrap; word-break:break-all; max-height:96px; overflow:auto; line-height:1.6 }
+.proj-test-out.ok { color:var(--ok) }
+.proj-test-out.bad { color:var(--err) }
+/* ============ Toast ============ */
+#toast { position:fixed; bottom:calc(24px + env(safe-area-inset-bottom)); left:50%%;
+   transform:translateX(-50%%) translateY(6px); padding:11px 20px; background:rgba(16,22,40,.92);
+   -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); border:1px solid var(--line); border-radius:12px;
+   font-size:.9em; font-weight:600; opacity:0; transition:opacity .22s,transform .22s; pointer-events:none;
+   z-index:99; max-width:88vw; text-align:center; box-shadow:0 12px 34px -8px rgba(0,0,0,.6) }
+#toast.show { opacity:1; transform:translateX(-50%%) translateY(0) }
+#toast.ok { color:var(--ok); border-color:rgba(67,209,124,.4) }
+#toast.error { color:var(--err); border-color:rgba(248,113,113,.4) }
+.info { color:var(--faint); font-size:.74em; letter-spacing:.12em; text-align:center; padding:18px 0 22px }
+.info a { color:var(--accent); text-decoration:none; border-bottom:1px dotted rgba(47,212,240,.4) }
+.info a:hover { color:#7fe8ff }
+/* ============ 卡片 (滑屏/系统/项目/股票 统一) ============ */
+.swipe-card,.sys-card { background:linear-gradient(175deg,rgba(255,255,255,.025),rgba(255,255,255,0) 34%%),var(--panel);
+   border:1px solid var(--line); border-radius:var(--r-lg); padding:16px; margin-bottom:14px;
+   box-shadow:var(--shadow-card) }
+.swipe-card-title,.sys-card-title { display:flex; align-items:center; gap:9px; margin-bottom:14px; color:var(--text);
+   font-size:.95em; font-weight:600; letter-spacing:.03em }
+.swipe-card-title::before,.sys-card-title::before { content:''; flex:0 0 4px; height:14px; border-radius:2px;
+   background:linear-gradient(180deg,var(--accent),#3d7bff) }
+.swipe-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;
+   padding-bottom:12px; border-bottom:1px solid var(--line-soft) }
+.swipe-card-header .swipe-card-title { margin:0 }
+.swipe-card-header .icon-btn { width:32px; height:32px; padding:0; background:rgba(47,212,240,.1);
+   border:1px solid rgba(47,212,240,.35); color:var(--accent); border-radius:10px; font-size:19px; font-weight:600;
+   line-height:1; cursor:pointer; transition:background .15s,transform .12s }
+.swipe-card-header .icon-btn:active { transform:translateY(1px); background:rgba(47,212,240,.2) }
+.swipe-card-footer { display:flex; justify-content:flex-end; margin-top:14px; padding-top:12px;
+   border-top:1px solid var(--line-soft) }
+.swipe-card-footer button { min-height:38px; padding:8px 18px; background:rgba(47,212,240,.12); color:var(--accent);
+   border:1px solid rgba(47,212,240,.4); border-radius:10px; font-size:13px; font-weight:600; cursor:pointer;
+   white-space:nowrap; transition:background .15s,transform .12s }
+.swipe-card-footer button:active { transform:translateY(1px); background:rgba(47,212,240,.2) }
+.swipe-card-footer button:disabled { opacity:.5; cursor:not-allowed }
+.swipe-card-footer button.btn-green { background:rgba(56,197,122,.13); color:#56cf87;
+   border-color:rgba(56,197,122,.35) }
+.swipe-card-footer button.btn-green:active { background:rgba(56,197,122,.22) }
+.swipe-card-footer button.dirty { background:rgba(251,191,36,.14); color:var(--warn);
+   border-color:rgba(251,191,36,.5); animation:dirty-pulse 1.4s ease-in-out infinite }
+@keyframes dirty-pulse {
+   0%%,100%% { box-shadow:0 0 0 0 rgba(251,191,36,.35) }
+   50%% { box-shadow:0 0 0 7px rgba(251,191,36,0) }
+}
+/* 股票卡内「持仓」小节标题行 */
+.stock-sub-head { display:flex; justify-content:space-between; align-items:center; gap:10px;
+   margin:16px 0 10px; padding-top:14px; border-top:1px solid var(--line-soft) }
+.stock-sub-head .sub-title { display:flex; align-items:center; gap:9px; color:var(--text); font-size:.9em;
+   font-weight:600; letter-spacing:.03em }
+.stock-sub-head .sub-title::before { content:''; flex:0 0 4px; height:13px; border-radius:2px;
+   background:linear-gradient(180deg,var(--accent),#3d7bff) }
+.swipe-field { margin-bottom:14px }
+.swipe-field:last-child { margin-bottom:0 }
+.swipe-field label { font-size:.8em; color:var(--muted); margin-bottom:6px }
+.swipe-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px }
+.swipe-row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px }
+.swipe-input-wrap { position:relative }
+.swipe-input-wrap input { padding-right:34px }
+.swipe-input-wrap .unit { position:absolute; right:11px; top:50%%; transform:translateY(-50%%); color:var(--faint);
+   font-size:.78em; pointer-events:none }
+.swipe-preview { background:rgba(47,212,240,.05); border:1px solid rgba(47,212,240,.18);
+   border-left:3px solid rgba(47,212,240,.55); border-radius:10px; padding:10px 12px; margin-top:12px;
+   font-family:var(--mono); font-size:.74em; line-height:1.65; color:var(--muted); word-break:break-all;
+   font-variant-numeric:tabular-nums }
+.swipe-preview b { color:var(--accent); font-weight:600 }
+/* ============ 折叠设备/条目卡 (device-card) ============ */
+.device-card { background:rgba(255,255,255,.02); border:1px solid var(--line-soft); border-radius:var(--r-md);
+   margin-bottom:10px; overflow:hidden }
+.device-card>summary { padding:11px 13px; min-height:48px; display:flex; justify-content:space-between;
+   align-items:center; gap:10px; list-style:none; cursor:pointer; user-select:none; color:var(--text);
+   font-size:.9em; font-weight:500; -webkit-tap-highlight-color:transparent }
+.device-card>summary::-webkit-details-marker { display:none }
+.device-card>summary::after { content:'▸'; flex:0 0 auto; color:var(--faint); font-size:.8em;
+   transition:transform .18s }
+.device-card[open]>summary::after { transform:rotate(90deg) }
+.device-card[open]>summary { border-bottom:1px solid var(--line-soft) }
+.device-card .body { padding:13px }
+.device-card .body .swipe-field { margin-bottom:12px }
+.device-summary-name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+   cursor:pointer }
+.device-summary-actions { display:flex; align-items:center; gap:6px; flex-shrink:0 }
+.device-summary-actions select { height:34px; min-width:130px; padding:0 28px 0 8px; font-size:12.5px;
+   border-radius:8px }
+.device-summary-actions .del { flex:0 0 34px; width:34px; height:34px; padding:0; background:var(--add); color:#fff;
+   border:none; border-radius:var(--r-sm); font-size:13px; line-height:1; cursor:pointer; white-space:nowrap }
+#swipe-devices:empty+.hint,#swipe-devices .hint { margin-top:0 }
+/* ============ 设备 SN / 复制按钮 ============ */
+.copy-btn { padding:8px 14px; min-height:36px; background:rgba(255,255,255,.05); border:1px solid var(--line);
+   color:var(--muted); border-radius:10px; font-size:13px; cursor:pointer; white-space:nowrap;
+   transition:background .15s }
+.copy-btn:active { background:rgba(255,255,255,.1) }
+/* ============ 云端数据源卡片 ============ */
+.cloud-src-row { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+   gap:6px 8px; padding:8px 0; border-bottom:1px dashed var(--line-soft) }
+.cloud-src-row:last-child { border-bottom:none }
+.cloud-src-name { font-size:.86em; color:var(--text) }
+.cloud-src-name .mono { margin-left:4px; color:var(--faint); font-family:var(--mono); font-size:.88em }
+.cloud-src-right { display:flex; align-items:center; gap:8px }
+.cloud-src-badge { display:inline-block; padding:2px 10px; border-radius:999px; border:1px solid currentColor;
+   font-size:.74em; line-height:1.4; white-space:nowrap }
+.cloud-src-badge.is-busy { opacity:.7 }
+.cloud-src-detail { flex-basis:100%%; font-size:.74em; color:var(--muted); line-height:1.5;
+   word-break:break-all }
+.cloud-src-row button { min-height:30px; padding:4px 12px; font-size:12px }
+.count-badge { display:inline-block; margin-left:2px; padding:1px 8px; border-radius:999px;
+   background:rgba(47,212,240,.1); border:1px solid rgba(47,212,240,.3); color:var(--accent); font-size:.74em;
+   font-weight:500; vertical-align:2px }
+/* ============ 闹钟 ============ */
+.alarm-row { background:var(--panel); border:1px solid var(--line); border-radius:var(--r-lg); padding:14px;
+   margin-bottom:12px; box-shadow:var(--shadow-card); transition:opacity .2s }
+.alarm-row.off { opacity:.45 }
+.alarm-head { display:flex; align-items:center; gap:10px }
+.alarm-name { color:var(--text); font-size:.9em; font-weight:600; white-space:nowrap }
+.alarm-time { margin-left:auto; display:flex; align-items:center; gap:5px }
+.alarm-time select { width:78px; height:38px; padding:0 26px 0 6px; font-size:15px; font-weight:600;
+   font-variant-numeric:tabular-nums; text-align-last:center; border-radius:var(--r-sm) }
+.alarm-time .colon { font-weight:700; color:var(--accent) }
+.alarm-msg { width:100%%; margin-top:12px }
+.alarm-days { display:flex; gap:6px; margin-top:12px }
+.day-btn { flex:1; min-height:34px; padding:6px 0; text-align:center; background:rgba(255,255,255,.03);
+   border:1px solid var(--line-soft); border-radius:999px; color:var(--muted); font-size:12.5px; cursor:pointer;
+   user-select:none; -webkit-tap-highlight-color:transparent;
+   transition:background .15s,color .15s,border-color .15s,transform .12s }
+.day-btn:active { transform:translateY(1px) }
+.day-btn.active { background:rgba(56,197,122,.16); color:#5ad68d; border-color:rgba(56,197,122,.45); font-weight:600 }
+.day-btn.day-once { flex:0 0 58px; border-color:rgba(251,191,36,.4); color:var(--warn) }
+.alarm-row.is-once .day-btn.day-once { background:rgba(251,191,36,.15); color:var(--warn); font-weight:600 }
+/* 新闻整点档位: 8 列 x 3 排网格, 单数字小圆角 (与闹钟星期胶囊区分) */
+.news-hours { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; margin-top:2px }
+.hour-chip { min-height:34px; padding:6px 0; text-align:center; background:rgba(255,255,255,.03);
+   border:1px solid var(--line-soft); border-radius:8px; color:var(--muted); font-size:13.5px; cursor:pointer;
+   user-select:none; -webkit-tap-highlight-color:transparent; font-variant-numeric:tabular-nums;
+   transition:background .15s,color .15s,border-color .15s,transform .12s }
+.hour-chip:hover { border-color:var(--line) }
+.hour-chip:active { transform:translateY(1px) }
+.hour-chip.active { background:rgba(56,197,122,.16); color:#5ad68d; border-color:rgba(56,197,122,.45); font-weight:600 }
+.hour-chip.dim { opacity:.45 }
+.hour-chip.dim.active { opacity:.85 }
+/* 新闻获取预览区 */
+.news-preview { margin-top:10px; border-top:1px dashed var(--line-soft); padding-top:10px }
+.news-preview:empty { display:none }
+.news-preview ol { margin:6px 0 6px 18px; padding:0; color:var(--text); font-size:.82em; line-height:1.7 }
+.news-preview audio { width:100%%; margin:8px 0 4px }
+.news-preview .np-meta { color:var(--muted); font-size:.78em; line-height:1.6 }
+/* ============ 股票 ============ */
+.stock-holding-card { background:rgba(255,255,255,.028); border:1px solid var(--line-soft);
+   border-radius:var(--r-md); padding:12px 14px; margin-bottom:8px; display:flex; justify-content:space-between;
+   align-items:center; cursor:pointer; transition:border-color .15s,background .15s,transform .15s,box-shadow .15s }
+.stock-holding-card:hover { border-color:rgba(47,212,240,.45); background:rgba(47,212,240,.05);
+   transform:translateY(-1px); box-shadow:0 8px 20px -10px rgba(2,8,22,.8) }
+.stock-holding-card:active { transform:translateY(0) }
+.stock-holding-card .l-name { color:var(--text); font-weight:600; font-size:.92em }
+.stock-holding-card .l-sub { color:var(--faint); font-size:.74em; margin-top:3px; font-variant-numeric:tabular-nums }
+.stock-holding-card .r-price { font-size:1.12em; font-weight:700; text-align:right;
+   font-variant-numeric:tabular-nums }
+.stock-holding-card .r-pl { font-size:.78em; text-align:right; margin-top:3px; font-weight:600;
+   font-variant-numeric:tabular-nums }
+.stock-holding-card .r-pl.ok { color:var(--ok) }
+.stock-holding-card .r-pl.warn { color:var(--warn) }
+.stock-holding-card .r-pl.danger { color:var(--err) }
+.kxian-tb { width:100%%; border-collapse:collapse; font-size:.78em; margin-top:6px;
+   font-variant-numeric:tabular-nums }
+.kxian-tb th,.kxian-tb td { padding:5px 6px; border-bottom:1px solid var(--line-soft); text-align:right }
+.kxian-tb th { color:var(--faint); font-weight:600; font-size:.92em }
+.kxian-tb th:first-child,.kxian-tb td:first-child { text-align:left }
+.kxian-tb tbody tr { transition:background .12s }
+.kxian-tb tbody tr:hover { background:rgba(255,255,255,.025) }
+.kxian-tb .k-up td:nth-child(2),.kxian-tb .k-up td:nth-child(3) { color:var(--ok) }
+.kxian-tb .k-dn td:nth-child(2),.kxian-tb .k-dn td:nth-child(3) { color:var(--err) }
+.kxian-tb.forecast { opacity:.82; font-style:italic }
+/* ============ 响应式 ============ */
+@media (max-width:480px) {
+   header.tabs { padding:8px 8px }
+   header.tabs .tab { padding:7px 10px; font-size:12.5px }
+   section.section { padding:12px 10px 2px }
+   h1 { font-size:1.16em; margin:16px 0 4px }
+   .swipe-card,.sys-card { padding:14px; border-radius:14px }
+   .key-row input.lbl { flex:0 0 70px }
+   .alarm-time select { width:72px; padding-right:24px }
+   .swipe-row3 { gap:8px }
+}
+@media (max-width:380px) {
+   header.tabs .tab { padding:6px 10px; font-size:12px }
+   .key-row input.lbl { flex:0 0 60px }
+   .key-row .eye-btn { flex:0 0 34px }
+   .group>summary .prov-disp { display:none }
+   .group>summary .badge { margin-left:0 }
+   .swipe-row3 { grid-template-columns:1fr 1fr }
+}
+@media (prefers-reduced-motion:reduce) {
+   *,*::before,*::after { animation:none !important; transition:none !important }
+}
+   </style>
+</head>
+
+<body>
+   <div class="wrap">
+      <h1>闲沐盒子配置</h1>
+      <header class="tabs">
+         <button type="button" class="tab" data-tab="wifi" onclick="switchTab('wifi')">无线</button>
+         <button type="button" class="tab" data-tab="keys" onclick="switchTab('keys')">密钥</button>
+         <button type="button" class="tab" data-tab="sys" onclick="switchTab('sys')">系统</button>
+         <button type="button" class="tab" data-tab="alarm" onclick="switchTab('alarm')">闹钟</button>
+         <button type="button" class="tab" data-tab="swipe" onclick="switchTab('swipe')">滑屏</button>
+         <button type="button" class="tab" data-tab="project" onclick="switchTab('project')">项目</button>
+         <button type="button" class="tab" data-tab="cloud" onclick="switchTab('cloud')">云服务</button>
+      </header>
+      <form id="f" onsubmit="return false">
+         <section class="section" data-section="wifi">
+            <h2>WiFi 网络</h2>
+            <div id="wifi-list"></div>
+            <button type="button" class="add-btn" onclick="addWifi()">+ 添加 WiFi</button>
+            <div class="hint">保存时自动过滤 SSID 为空的条目</div>
+         </section>
+         <section class="section" data-section="keys">
+            <h2>API 密钥</h2>
+            <div id="key-groups"></div>
+            <div style="display:flex;gap:6px;margin:10px 0 4px;flex-wrap:wrap">
+               <button type="button" class="add-btn" onclick="showAddProvider()">+ 添加服务商</button>
+            </div>
+            <div id="prov-add" class="inline-form">
+               <input id="prov-input" placeholder="代号，如 deepseek / siliconflow / kimi" autocomplete="off">
+               <button type="button" class="add-btn" onclick="confirmAddProvider()">确认</button>
+               <button type="button" class="add-btn btn-neutral"
+                  onclick="cancelAddProvider()">取消</button>
+            </div>
+
+            <div class="swipe-card" style="margin-top:14px">
+               <div class="swipe-card-header">
+                  <div class="swipe-card-title">实时余额</div>
+                  <button type="button" id="bal-refresh-btn" class="add-btn" onclick="refreshBalance()">&#x21bb;
+                     刷新</button>
+               </div>
+               <div id="bal-list">
+                  <div class="empty">点击刷新拉取余额</div>
+               </div>
+            </div>
+         </section>
+         <section class="section" data-section="sys">
+            <div class="sys-card">
+               <div class="sys-card-title">显示</div>
+               <div class="swipe-field">
+                  <label>屏幕亮度</label>
+                  <input type="number" id="brightness" min="25" max="100" step="25" value="%(brightness)d">
+               </div>
+               <div class="hint">25 / 50 / 75 / 100 四档，保存后立即生效</div>
+            </div>
+
+            <div class="sys-card">
+               <div class="sys-card-title">时间</div>
+               <div class="hint">时区固定为北京时间 UTC+8，NTP 同步后自动修正</div>
+               <button type="button" class="add-btn" id="sync-time-btn" onclick="syncTime()"
+                  style="margin-top:4px">&#x21bb; 同步设备时间</button>
+            </div>
+
+            <div class="sys-card">
+               <div class="sys-card-title">网络</div>
+               <div class="swipe-field">
+                  <label>HTTP 端口</label>
+                  <input type="number" id="http_port" min="1" max="65535" value="%(http_port)d">
+               </div>
+               <div class="hint">1 ~ 65535，修改后需重启 HTTP 服务</div>
+            </div>
+
+            <div class="sys-card">
+               <div class="sys-card-title">设备信息</div>
+               <div class="swipe-field">
+                  <label>序列号 SN</label>
+                  <input type="text" id="sys_sn" readonly>
+               </div>
+               <div class="hint">设备唯一编号，接入云平台前需先在平台登记此 SN</div>
+            </div>
+
+            <div class="sys-card">
+               <div class="sys-card-title">当前天气</div>
+               <div id="weather-current" class="hint" style="padding:6px 0">加载中...</div>
+               <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+                  <button type="button" class="add-btn" onclick="refreshWeatherNow()">&#x21bb; 立即刷新</button>
+                  <span class="hint" style="margin:0;padding:0">缓存 10 分钟</span>
+               </div>
+            </div>
+
+            <div class="sys-card">
+               <div class="sys-card-title">城市</div>
+               <div class="swipe-field">
+                  <label>选择城市</label>
+                  <select id="weather_city"></select>
+               </div>
+               <div class="hint">设备端按此城市显示天气，传递给心知天气 API</div>
+               <div id="weather_city_info" class="hint" style="margin-top:4px"></div>
+            </div>
+
+            <div class="sys-card">
+               <div class="sys-card-title">API 密钥</div>
+               <div class="swipe-field">
+                  <label>API Key</label>
+                  <input type="text" id="weather_api_key" placeholder="your_api_key_here" autocomplete="off">
+               </div>
+               <div class="hint">心知天气 v3: <a href="https://www.seniverse.com" target="_blank">seniverse.com</a>
+                  （免费版仅返回天气现象和气温，湿度/AQI/紫外线 不可用）</div>
+            </div>
+
+         </section>
+         <section class="section" data-section="alarm">
+            <div class="swipe-card">
+               <div class="swipe-card-title">网络时钟闹钟</div>
+               <div class="hint">共 3 组，点击星期切换重复规则：<b>不选任何星期 = 单次</b>（触发一次后自动关闭），全选 = 每天。
+                  可填提醒文字（最多 16 字），响铃时显示在屏幕上替代 ALARM。
+                  触发时设备响铃并亮屏，任意按键停止，60 秒后自动静默。修改后需点击下方保存。</div>
+               <div id="alarm-list"></div>
+               <div class="swipe-card-footer">
+                  <button onclick="saveAlarms()" id="alarm-save-btn">保存闹钟</button>
+               </div>
+            </div>
+         </section>
+         <section class="section" data-section="swipe">
+            <div class="swipe-card">
+               <div class="swipe-card-title">当前设置</div>
+               <div class="swipe-field">
+                  <label>滑动模式</label>
+                  <select id="swipe_mode" onchange="onSwipeCurrentChange()">
+                     <option value="0">刷新视频-上滑</option>
+                     <option value="1">刷新视频-下滑</option>
+                     <option value="2">看书-左滑</option>
+                     <option value="3">看书-右滑</option>
+                  </select>
+               </div>
+               <div class="swipe-field">
+                  <label>当前活跃设备</label>
+                  <select id="swipe_active_device"></select>
+               </div>
+               <div class="hint">选择当前使用哪台设备的分辨率</div>
+               <div class="swipe-card-footer">
+                  <button onclick="saveSwipePartial('current')" id="swipe-save-current">保存本卡</button>
+               </div>
+            </div>
+
+            <div class="swipe-card">
+               <div class="swipe-card-title">模式参数</div>
+               <div id="swipe-modes"></div>
+               <div class="swipe-card-footer">
+                  <button onclick="saveSwipePartial('modes')" id="swipe-save-modes">保存本卡</button>
+               </div>
+            </div>
+
+            <div class="swipe-card">
+               <div class="swipe-card-header">
+                  <div class="swipe-card-title">设备分辨率</div>
+                  <button type="button" class="icon-btn" onclick="addDevice()" title="添加设备">+</button>
+               </div>
+               <div id="swipe-devices"></div>
+               <div class="swipe-card-footer">
+                  <button onclick="saveSwipePartial('devices')" id="swipe-save-devices">保存本卡</button>
+               </div>
+            </div>
+         </section>
+         <section class="section" data-section="project">
+            <div class="swipe-card">
+               <div class="swipe-card-title">股票</div>
+               <div class="swipe-field">
+                  <label>Endpoint</label>
+                  <input id="stock_endpoint" value="%(stock_endpoint)s" placeholder="http://www.mooview.cn/api/">
+               </div>
+               <div class="swipe-field">
+                  <label>API Key</label>
+                  <input id="stock_api_key" value="%(stock_api_key)s" placeholder="用户级 key" autocomplete="off"
+                     spellcheck="false">
+               </div>
+               <div class="hint">闲沐数观 用户级 API Key, 用于查询股票持仓与 K 线 (<a href="https://www.mooview.cn/"
+                     target="_blank">mooview.cn</a>)</div>
+               <div class="stock-sub-head">
+                  <span class="sub-title">持仓</span>
+                  <button type="button" class="add-btn" onclick="refreshStock()">&#x21bb; 刷新</button>
+               </div>
+               <div class="hint">点击持仓卡片查看 K 线行情</div>
+               <div id="stock-holdings" class="hint">点击刷新拉取持仓数据</div>
+               <div id="stock-kxian"></div>
+               <div class="swipe-card-footer">
+                  <button onclick="saveStockConfig()" id="stock-save-config">保存配置</button>
+                  <button onclick="testStockConnection()" id="stock-test-btn" class="btn-green"
+                     style="margin-left:8px">测试连接</button>
+               </div>
+            </div>
+
+            <div class="swipe-card">
+               <div class="swipe-card-header">
+                  <div class="swipe-card-title">自有网站 <span class="count-badge" id="proj-os-count">0</span></div>
+                  <button type="button" class="icon-btn" onclick="addOwnSite()" title="添加自有网站">+</button>
+               </div>
+               <div id="proj-own-sites"></div>
+               <div class="swipe-card-footer">
+                  <button onclick="saveProjectPartial('own_sites')" id="proj-save-own-sites">保存本卡</button>
+               </div>
+            </div>
+
+            <div class="swipe-card">
+               <div class="swipe-card-header">
+                  <div class="swipe-card-title">自媒体 <span class="count-badge" id="proj-sm-count">0</span></div>
+                  <button type="button" class="icon-btn" onclick="addSelfMedia()" title="添加自媒体">+</button>
+               </div>
+               <div id="proj-self-media"></div>
+               <div class="hint">设备会 GET 每个账号的数据接口地址, 期望返回 JSON:
+                  {"fans":8881,"works":123,"likes":80000,"views":12}
+                  (粉丝/作品/获赞/播放)。地址留空或拉取失败时显示演示数据。</div>
+               <div class="swipe-card-footer">
+                  <button onclick="saveProjectPartial('self_media')" id="proj-save-self-media">保存本卡</button>
+               </div>
+            </div>
+         </section>
+         <section class="section" data-section="cloud">
+            <div class="swipe-card">
+               <div class="swipe-card-title">设备 SN / 云服务</div>
+               <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap">
+                  <div class="swipe-field" style="flex:1;min-width:230px;margin-bottom:0">
+                     <label>设备 SN</label>
+                     <div style="display:flex;gap:6px;align-items:center">
+                        <input id="proj_device_sn" value="%(device_sn)s" readonly style="flex:1;font-family:monospace">
+                        <button type="button" class="copy-btn" onclick="copyDeviceSn(this)">复制</button>
+                     </div>
+                  </div>
+                  <div class="swipe-field" style="width:170px;margin-bottom:0">
+                     <label>云服务开关</label>
+                     <select id="cloud_enabled">
+                        <option value="1">开启</option>
+                        <option value="0">关闭</option>
+                     </select>
+                  </div>
+               </div>
+               <div class="hint">SN 由设备首次启动时自动生成, 不可修改。绑定: 到
+                  <a href="https://api.wwzu.com/portal/" target="_blank" rel="noopener">平台门户</a>
+                  注册后, 在「我的设备」填入上方 SN 发起绑定, 再到设备端
+                  「本机设置-云端激活」读 6 位激活码(5 分钟有效)回填网页。
+                  云供「天天中奖」取数, 不可用时自动回落第三方源。</div>
+               <div class="swipe-card-footer">
+                  <button onclick="saveCloudConfig()" id="cloud-save-config">保存开关</button>
+               </div>
+            </div>
+
+            <div class="swipe-card">
+               <div class="swipe-card-header">
+                  <div class="swipe-card-title">服务状态</div>
+                  <button type="button" class="add-btn" onclick="refreshCloudStatus()">&#x21bb; 刷新</button>
+               </div>
+               <div id="cloud-status" class="hint" style="padding:6px 0">加载中...</div>
+            </div>
+
+            <div class="swipe-card">
+               <div class="swipe-card-header">
+                  <div class="swipe-card-title">云端数据源</div>
+                  <button type="button" class="add-btn" id="cloud-src-probe-all" onclick="probeAllCloudSources()">&#x21bb; 全部检测</button>
+               </div>
+               <div id="cloud-source-list" class="hint" style="padding:6px 0">加载中...</div>
+               <div class="hint">逐源取数验证 (每源约 1~10s); 未订阅的源请到
+                  <a href="https://api.wwzu.com/portal/" target="_blank" rel="noopener">平台门户</a> 订阅。</div>
+            </div>
+
+            <div class="swipe-card">
+               <div class="swipe-card-title">整点新闻播报</div>
+               <div class="swipe-field" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                  <label style="margin:0">自动播报开关</label>
+                  <label class="switch" title="整点自动播报总开关">
+                     <input type="checkbox" id="news_enabled_sw">
+                     <span class="slider"></span>
+                  </label>
+               </div>
+               <div class="hint">关闭后仅停用整点自动播报, 手动播报不受影响</div>
+               <div class="swipe-field" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                  <label style="margin:0">播报音量</label>
+                  <input type="number" id="news_volume" min="0" max="100"
+                     value="%(news_volume)d" style="width:110px">
+               </div>
+               <div class="hint">0~100, 下次播报生效</div>
+               <div class="swipe-field">
+                  <label>整点档位</label>
+                  <div id="news-hours" class="news-hours"></div>
+               </div>
+               <div class="hint">勾选档位整点自动播报, 播报中任意键停止; 平台每日仅 9~22 点出稿</div>
+               <div class="swipe-card-footer">
+                  <button onclick="saveNews()" id="news-save-btn">保存设置</button>
+               </div>
+            </div>
+
+            <div class="swipe-card">
+               <div class="swipe-card-header">
+                  <div class="swipe-card-title">立即播报 / 立即获取</div>
+                  <div style="display:flex;gap:6px">
+                     <button type="button" class="add-btn" id="news-fetch-btn"
+                        onclick="fetchNewsPreview()">&#x2913; 立即获取</button>
+                     <button type="button" class="add-btn" id="news-play-btn"
+                        onclick="playNewsNow()">&#x25B6; 立即播报</button>
+                  </div>
+               </div>
+               <div id="news-status" class="hint" style="padding:6px 0">加载中...</div>
+               <div id="news-preview" class="news-preview"></div>
+               <div class="hint">「立即获取」核对接口与试听; 「立即播报」从设备喇叭播出, 任意键可停。
+                  需联网并在 <a href="https://api.wwzu.com/portal/" target="_blank"
+                     rel="noopener">平台门户</a> 订阅 news_hourly 数据源。</div>
+            </div>
+         </section>
+         <button class="primary" id="save-btn" onclick="save()">保存</button>
+      </form>
+      <div class="info">ESP32 XianMuBox &bull; 设置 &bull; <a href="http://www.miaoking.com" target="_blank" rel="noopener">闲沐工坊</a></div>
+      <div id="toast"></div>
+      <script>
+         var WIFI =%(wifi)s;
+         var KEYS =%(keys)s;
+         var KEYS_HIDDEN =%(keys_hidden)s;
+         var SWIPE_MODES =%(swipe_modes)s;
+         var SWIPE_DEVICES =%(swipe_devices)s;
+         var DEVICE_SN = '%(device_sn)s';
+         var PROJ_SELF_MEDIA =%(project_self_media)s;
+         var PROJ_OWN_SITES =%(project_own_sites)s;
+         var WEATHER_CITIES =%(weather_cities)s;
+         var WEATHER_API_KEY = '%(weather_api_key)s';
+         var WEATHER_CITY = '%(weather_city)s';
+         var STOCK_ENDPOINT = '%(stock_endpoint)s';
+         var STOCK_API_KEY = '%(stock_api_key)s';
+         var CLOUD_ENABLED = %(cloud_enabled)s;
+         var ALARMS =%(alarms)s;
+         var NEWS_ENABLED = %(news_enabled)s;
+         var NEWS_HOURS =%(news_hours)s;
+         var NEWS_VOLUME = %(news_volume)d;
+         /* NEWS_HOURS: 允许整点自动播报的档位 [9..22]; 平台档期 9:00~22:00 */
+         /* ALARMS 结构: [{en:bool,h:0-23,m:0-59,days:[0=日..6=六]}, ...] 恒 3 组 */
+         /* KEYS 结构: {"deepseek":[{"label":"DeepSeek-1","key":"sk-..."}], ...}
+            顺序与 settings.json 一致; ai_token 不在此处 (单独输入框) */
+         /* KEYS_HIDDEN: 停用显示的服务商代号列表 (设备端不读取/不显示/不请求余额) */
+         /* 服务商元数据: 显示名 + 品牌色, 未知服务商用中性色兜底 */
+         var PROV_META = {
+            deepseek: { name: 'DeepSeek', color: '#4d6bfe' },
+            siliconflow: { name: 'SiliconFlow', color: '#8b5cf6' },
+            zhipu: { name: 'Zhipu', color: '#38bdf8' },
+            kimi: { name: 'Kimi', color: '#e2e8f0' }
+         };
+         var PROV_FALLBACK_COLOR = '#64748b';
+         function provMeta(p) {
+            var m = PROV_META[String(p == null ? '' : p).toLowerCase()];
+            return m || { name: String(p || ''), color: PROV_FALLBACK_COLOR };
+         }
+         function isProvHidden(p) { return KEYS_HIDDEN.indexOf(p) >= 0; }
+
+         // ============ 页签 ============
+         function switchTab(name) {
+            var tabs = document.querySelectorAll('header.tabs .tab');
+            var secs = document.querySelectorAll('section.section');
+            tabs.forEach(function (t) { t.classList.toggle('active', t.dataset.tab === name); });
+            secs.forEach(function (s) { s.classList.toggle('active', s.dataset.section === name); });
+            try { localStorage.setItem('xmb_tab', name); } catch (e) { }
+            /* 项目/云服务/闹钟 Tab 无全局可保存字段，隐藏底部保存按钮避免误导 */
+            var saveBtn = document.getElementById('save-btn');
+            if (saveBtn) { saveBtn.style.display = (name === 'project' || name === 'cloud' || name === 'alarm') ? 'none' : ''; }
+         }
+         (function () {
+            var init = 'sys';
+            try { var s = localStorage.getItem('xmb_tab'); if (s) init = s; } catch (e) { }
+            if (init === 'stock') init = 'project'; /* 股票页签已并入项目 */
+            if (init === 'news') init = 'cloud'; /* 新闻页签已并入云服务 */
+            if (!document.querySelector('header.tabs .tab[data-tab="' + init + '"]')) init = 'sys';
+            switchTab(init);
+         })();
+
+         // ============ 通用：二次确认删除按钮 ============
+         function makeDelBtn(text, onConfirm) {
+            var state = 0;
+            var btn = document.createElement('button');
+            var resetTimer = null;
+            btn.type = 'button'; btn.className = 'del'; btn.textContent = text || '删';
+            btn.onclick = function () {
+               if (state === 0) {
+                  btn.textContent = '确认';
+                  btn.classList.add('confirming');
+                  state = 1;
+                  if (resetTimer) clearTimeout(resetTimer);
+                  resetTimer = setTimeout(function () {
+                     if (state === 1) { btn.textContent = text || '删'; btn.classList.remove('confirming'); state = 0; }
+                     resetTimer = null;
+                  }, 3000);
+               } else { if (resetTimer) { clearTimeout(resetTimer); resetTimer = null; } onConfirm(); }
+            };
+            return btn;
+         }
+
+         // ============ WiFi ============
+         function addWifi(ssid, pwd) {
+            ssid = ssid || ''; pwd = pwd || '';
+            var div = document.getElementById('wifi-list');
+            var row = document.createElement('div'); row.className = 'wifi-row';
+            var s = document.createElement('input'); s.type = 'text'; s.className = 'ssid';
+            s.placeholder = 'SSID'; s.value = ssid;
+            var p = document.createElement('input'); p.type = 'text'; p.className = 'pwd';
+            p.placeholder = '密码'; p.value = pwd;
+            var d = makeDelBtn('删', function () { row.remove(); });
+            row.appendChild(s); row.appendChild(p); row.appendChild(d);
+            div.appendChild(row);
+         }
+         WIFI.forEach(function (w) { addWifi(w[0], w[1]); });
+
+         // ============ API Keys (分组) ============
+         function escapeHtml(s) {
+            return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+               .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+         }
+
+         function renderKeyGroups() {
+            var box = document.getElementById('key-groups');
+            box.innerHTML = '';
+            var providers = Object.keys(KEYS);
+            if (providers.length === 0) {
+               var hint = document.createElement('div');
+               hint.className = 'hint'; hint.textContent = '暂无服务商，点击下方按钮添加';
+               box.appendChild(hint);
+               return;
+            }
+            providers.forEach(function (prov) {
+               var items = KEYS[prov];
+               var meta = provMeta(prov);
+               var hidden = isProvHidden(prov);
+               var det = document.createElement('details');
+               det.className = 'group' + (hidden ? ' off' : '');
+               det.open = !hidden; det.dataset.prov = prov;
+               var sum = document.createElement('summary');
+
+               var head = document.createElement('span'); head.className = 'prov-head';
+               var avatar = document.createElement('span'); avatar.className = 'prov-avatar';
+               avatar.textContent = (meta.name || prov).charAt(0).toUpperCase();
+               avatar.style.background = meta.color + '26';
+               avatar.style.border = '1px solid ' + meta.color;
+               avatar.style.color = meta.color;
+               var name = document.createElement('span'); name.className = 'prov-name';
+               name.textContent = prov;
+               var disp = document.createElement('span'); disp.className = 'prov-disp';
+               disp.textContent = PROV_META[String(prov).toLowerCase()] ? meta.name : '';
+               head.appendChild(avatar); head.appendChild(name);
+               if (disp.textContent) head.appendChild(disp);
+
+               var right = document.createElement('span'); right.className = 'prov-actions';
+               var badge = document.createElement('span'); badge.className = 'badge';
+               badge.textContent = hidden
+                  ? '已停用 · ' + items.length
+                  : items.length + ' key' + (items.length > 1 ? 's' : '');
+
+               /* 显示开关: 关闭后设备不读取/不显示该服务商全部密钥 */
+               var sw = document.createElement('span');
+               sw.className = 'switch'; sw.title = hidden ? '开启设备显示' : '关闭设备显示';
+               var cb = document.createElement('input');
+               cb.type = 'checkbox'; cb.checked = !hidden;
+               var sl = document.createElement('span'); sl.className = 'slider';
+               sw.appendChild(cb); sw.appendChild(sl);
+               sw.onclick = function (e) {
+                  e.preventDefault(); e.stopPropagation();
+                  setProvHidden(prov, !isProvHidden(prov));
+               };
+
+               var del = makeDelBtn('删', function () {
+                  delete KEYS[prov];
+                  var hi = KEYS_HIDDEN.indexOf(prov);
+                  if (hi >= 0) KEYS_HIDDEN.splice(hi, 1);
+                  renderKeyGroups();
+               });
+               del.className = 'prov-del';
+               del.title = '删除此服务商';
+               var arrow = document.createElement('span'); arrow.className = 'arrow';
+               arrow.textContent = '\u25b8';
+               right.appendChild(badge);
+               right.appendChild(sw);
+               right.appendChild(del);
+               right.appendChild(arrow);
+               sum.appendChild(head); sum.appendChild(right);
+               det.appendChild(sum);
+               var body = document.createElement('div'); body.className = 'body';
+               items.forEach(function (it, idx) {
+                  body.appendChild(makeKeyRow(prov, idx, it, hidden));
+               });
+               var addBtn = document.createElement('button'); addBtn.type = 'button';
+               addBtn.className = 'add-btn'; addBtn.textContent = '+ 添加 Key';
+               addBtn.style.marginTop = '4px';
+               if (hidden) { addBtn.disabled = true; addBtn.style.opacity = '.5'; }
+               addBtn.onclick = function () {
+                  if (!KEYS[prov]) KEYS[prov] = [];
+                  var next = KEYS[prov].length + 1;
+                  KEYS[prov].push({ label: prov + '-' + next, key: '' });
+                  renderKeyGroups();
+               };
+               body.appendChild(addBtn);
+               det.appendChild(body);
+               box.appendChild(det);
+            });
+         }
+
+         function setProvHidden(prov, hidden) {
+            var i = KEYS_HIDDEN.indexOf(prov);
+            if (hidden) { if (i < 0) KEYS_HIDDEN.push(prov); }
+            else { if (i >= 0) KEYS_HIDDEN.splice(i, 1); }
+            renderKeyGroups();
+         }
+
+         /* 密钥输入框默认遮罩, 眼睛按钮切换明文/圆点 */
+         var EYE_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+         var EYE_OFF_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+         function makeKeyRow(prov, idx, it, hidden) {
+            var row = document.createElement('div'); row.className = 'key-row';
+            var lbl = document.createElement('input'); lbl.type = 'text';
+            lbl.className = 'lbl'; lbl.placeholder = '标签'; lbl.value = it.label || '';
+            lbl.maxLength = 24;
+            lbl.oninput = function () { if (KEYS[prov] && KEYS[prov][idx]) KEYS[prov][idx].label = lbl.value; };
+            var k = document.createElement('input'); k.type = 'password';
+            k.className = 'k'; k.placeholder = 'sk-...'; k.value = it.key || '';
+            k.autocomplete = 'off'; k.spellcheck = false;
+            k.oninput = function () { if (KEYS[prov] && KEYS[prov][idx]) KEYS[prov][idx].key = k.value; };
+            var eye = document.createElement('button');
+            eye.type = 'button'; eye.className = 'eye-btn'; eye.title = '显示/隐藏密钥';
+            eye.innerHTML = EYE_OFF_SVG;
+            eye.onclick = function () {
+               var show = k.type === 'password';
+               k.type = show ? 'text' : 'password';
+               eye.innerHTML = show ? EYE_SVG : EYE_OFF_SVG;
+               eye.classList.toggle('on', show);
+            };
+            if (hidden) { lbl.disabled = true; k.disabled = true; }
+            var del = makeDelBtn('删', function () {
+               if (KEYS[prov]) { KEYS[prov].splice(idx, 1); renderKeyGroups(); }
+            });
+            del.title = '删除此 key';
+            if (hidden) del.disabled = true;
+            row.appendChild(lbl); row.appendChild(k); row.appendChild(eye); row.appendChild(del);
+            return row;
+         }
+
+         function showAddProvider() {
+            var el = document.getElementById('prov-add');
+            el.style.display = 'flex';
+            document.getElementById('prov-input').focus();
+         }
+         function cancelAddProvider() {
+            document.getElementById('prov-add').style.display = 'none';
+            document.getElementById('prov-input').value = '';
+         }
+         function confirmAddProvider() {
+            var name = document.getElementById('prov-input').value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+            if (!name) { showToast('代号无效', false); return; }
+            if (KEYS[name]) { showToast('服务商 "' + escapeHtml(name) + '" 已存在', false); return; }
+            KEYS[name] = []; renderKeyGroups(); cancelAddProvider();
+         }
+
+         renderKeyGroups();
+
+         // ============ 滑屏配置 ============
+         var PHONE_RESOLUTIONS = [
+            ['1080', '1920'], ['720', '1280'], ['1080', '2340'],
+            ['1080', '2400'], ['1440', '2560'], ['1440', '3200']
+         ];
+
+         function makeResSelect(selected) {
+            var sel = document.createElement('select');
+            PHONE_RESOLUTIONS.forEach(function (r) {
+               var opt = document.createElement('option');
+               opt.value = r[0] + ',' + r[1];
+               opt.textContent = r[0] + ' x ' + r[1];
+               if (r[0] + ',' + r[1] === selected) opt.selected = true;
+               sel.appendChild(opt);
+            });
+            return sel;
+         }
+
+         function numInput(label, val, min, max, unit, onchange) {
+            var d = document.createElement('div'); d.className = 'swipe-field';
+            var l = document.createElement('label'); l.textContent = label;
+            var wrap = document.createElement('div'); wrap.className = 'swipe-input-wrap';
+            var i = document.createElement('input'); i.type = 'number'; i.min = min; i.max = max; i.value = val;
+            i.oninput = function () { onchange(parseInt(i.value) || 0); };
+            wrap.appendChild(i);
+            if (unit) { var u = document.createElement('span'); u.className = 'unit'; u.textContent = unit; wrap.appendChild(u); }
+            d.appendChild(l); d.appendChild(wrap); return d;
+         }
+
+         // 计算当前活跃设备
+         function getActiveDevice() {
+            var sel = document.getElementById('swipe_active_device');
+            if (!sel) return null;
+            var idx = parseInt(sel.value) || 0;
+            if (!SWIPE_DEVICES || idx < 0 || idx >= SWIPE_DEVICES.length) return null;
+            return SWIPE_DEVICES[idx];
+         }
+
+         // 计算滑动坐标预览（与 modes/swipe_ble.py 的 swipe_up/down/left/right 行为保持一致）
+         function getSwipeEndpoints(mode, dev) {
+            if (!dev) return null;
+            var sw = parseInt(dev.screen_w) || 1080;
+            var sh = parseInt(dev.screen_h) || 1920;
+            var ratio = parseInt(mode.swipe_offset_ratio) || 6;
+            var steps = parseInt(mode.swipe_steps) || 5;
+            var cx = Math.floor(sw / 2);
+            var cy = Math.floor(sh / 2);
+            // 上/下用屏幕高度做分母；左/右用屏幕宽度做分母
+            var dir = (mode.name || '').indexOf('左') >= 0 || (mode.name || '').indexOf('右') >= 0 ? 'h' : 'v';
+            var denom = dir === 'h' ? sw : sh;
+            var off = Math.floor(denom / Math.max(ratio, 1));
+            var x1, y1, x2, y2;
+            if ((mode.name || '').indexOf('上') >= 0) {
+               x1 = cx; y1 = cy + Math.floor(off / 2);
+               x2 = cx; y2 = cy - Math.floor(off / 2);
+            } else if ((mode.name || '').indexOf('下') >= 0) {
+               x1 = cx; y1 = cy - Math.floor(off / 2);
+               x2 = cx; y2 = cy + Math.floor(off / 2);
+            } else if ((mode.name || '').indexOf('左') >= 0) {
+               x1 = cx + Math.floor(off / 2); y1 = cy;
+               x2 = cx - Math.floor(off / 2); y2 = cy;
+            } else if ((mode.name || '').indexOf('右') >= 0) {
+               x1 = cx - Math.floor(off / 2); y1 = cy;
+               x2 = cx + Math.floor(off / 2); y2 = cy;
+            } else {
+               x1 = cx; y1 = cy + Math.floor(off / 2);
+               x2 = cx; y2 = cy - Math.floor(off / 2);
+            }
+            return { sw: sw, sh: sh, off: off, steps: steps, dir: dir, x1: x1, y1: y1, x2: x2, y2: y2 };
+         }
+
+         function updateSwipePreview(modeCard, mode) {
+            var dev = getActiveDevice();
+            var box = modeCard.querySelector('.swipe-preview');
+            if (!box) return;
+            var ep = getSwipeEndpoints(mode, dev);
+            if (!ep) { box.innerHTML = '请先在“当前设置”卡选择活跃设备'; return; }
+            var dirLabel = ep.dir === 'h' ? '横向' : '纵向';
+            box.innerHTML = '<b>' + escapeHtml(mode.name) + '</b> · ' + dirLabel + '滑动<br>' +
+               '起点 <b>(' + ep.x1 + ', ' + ep.y1 + ')</b> → 终点 <b>(' + ep.x2 + ', ' + ep.y2 + ')</b><br>' +
+               '偏移 <b>' + ep.off + '</b>px · 步数 <b>' + ep.steps + '</b> · 分辨率 <b>' + ep.sw + '×' + ep.sh + '</b>';
+         }
+
+         // 活跃设备下拉框
+         function renderActiveDevice() {
+            var sel = document.getElementById('swipe_active_device');
+            var currentIdx = parseInt(sel.dataset.idx || '%(swipe_active_device_idx)d') || 0;
+            sel.innerHTML = '';
+            if (!SWIPE_DEVICES || SWIPE_DEVICES.length === 0) {
+               var opt = document.createElement('option');
+               opt.value = '0'; opt.textContent = '无设备';
+               sel.appendChild(opt); return;
+            }
+            SWIPE_DEVICES.forEach(function (dev, idx) {
+               var opt = document.createElement('option');
+               opt.value = idx; opt.textContent = (dev.name || ('设备' + idx)) + ' (' + (dev.screen_w || 1080) + 'x' + (dev.screen_h || 1920) + ')';
+               if (idx === currentIdx) opt.selected = true;
+               sel.appendChild(opt);
+            });
+            sel.dataset.idx = sel.value;
+         }
+
+         // 模式参数卡片
+         function renderSwipeModes() {
+            var box = document.getElementById('swipe-modes');
+            box.innerHTML = '';
+            if (!SWIPE_MODES || SWIPE_MODES.length === 0) {
+               var hint = document.createElement('div'); hint.className = 'hint';
+               hint.textContent = '暂无模式参数';
+               box.appendChild(hint); return;
+            }
+            SWIPE_MODES.forEach(function (mode, idx) {
+               box.appendChild(makeModeCard(mode, idx));
+            });
+         }
+
+         function makeModeCard(mode, idx) {
+            var det = document.createElement('details'); det.className = 'device-card'; det.open = (idx === 0);
+            var sum = document.createElement('summary');
+            var left = document.createElement('span'); left.textContent = mode.name || ('模式' + idx);
+            sum.appendChild(left);
+            det.appendChild(sum);
+
+            var body = document.createElement('div'); body.className = 'body';
+
+            var row2 = document.createElement('div'); row2.className = 'swipe-row2';
+            row2.appendChild(numInput('最短间隔', mode.interval_min || 5, 1, 120, 's', function (v) { mode.interval_min = v; }));
+            row2.appendChild(numInput('最长间隔', mode.interval_max || 15, 5, 300, 's', function (v) { mode.interval_max = v; }));
+            body.appendChild(row2);
+
+            var row3 = document.createElement('div'); row3.className = 'swipe-row3';
+            var updatePreview = function () { updateSwipePreview(det, mode); };
+            row3.appendChild(numInput('偏移比例', mode.swipe_offset_ratio || 6, 1, 100, '/h', function (v) { mode.swipe_offset_ratio = v; updatePreview(); }));
+            row3.appendChild(numInput('滑动步数', mode.swipe_steps || 5, 1, 100, '', function (v) { mode.swipe_steps = v; updatePreview(); }));
+            row3.appendChild(numInput('每步延迟', mode.swipe_delay_ms || 20, 1, 1000, 'ms', function (v) { mode.swipe_delay_ms = v; }));
+            body.appendChild(row3);
+
+            var preview = document.createElement('div'); preview.className = 'swipe-preview';
+            body.appendChild(preview);
+
+            var hint = document.createElement('div'); hint.className = 'hint';
+            hint.textContent = '偏移比例 = 屏幕高度 / N；步数越多滑动越平滑';
+            body.appendChild(hint);
+
+            det.appendChild(body);
+            // 首次渲染时计算一次坐标预览
+            setTimeout(function () { updateSwipePreview(det, mode); }, 0);
+            return det;
+         }
+
+         // 设备分辨率列表
+         function renderDevices() {
+            var box = document.getElementById('swipe-devices');
+            box.innerHTML = '';
+            if (!SWIPE_DEVICES || SWIPE_DEVICES.length === 0) {
+               var hint = document.createElement('div'); hint.className = 'hint';
+               hint.textContent = '暂无设备，点击下方按钮添加';
+               box.appendChild(hint);
+               renderActiveDevice();
+               return;
+            }
+            var activeIdx = parseInt(document.getElementById('swipe_active_device').value) || 0;
+            SWIPE_DEVICES.forEach(function (dev, idx) {
+               box.appendChild(makeDeviceRow(dev, idx, idx === activeIdx));
+            });
+            renderActiveDevice();
+         }
+
+         function makeDeviceRow(dev, idx, isActive) {
+            var det = document.createElement('details'); det.className = 'device-card'; det.open = true;
+            var sum = document.createElement('summary');
+
+            var nameSpan = document.createElement('span');
+            nameSpan.className = 'device-summary-name';
+            nameSpan.textContent = (isActive ? '● ' : '') + (dev.name || ('设备' + idx));
+            if (isActive) nameSpan.style.color = 'var(--accent)';
+
+            var actions = document.createElement('span'); actions.className = 'device-summary-actions';
+
+            var resSel = makeResSelect((dev.screen_w || 1080) + ',' + (dev.screen_h || 1920));
+            resSel.onchange = function (e) {
+               e.stopPropagation();
+               var v = resSel.value.split(','); dev.screen_w = parseInt(v[0]); dev.screen_h = parseInt(v[1]);
+               renderActiveDevice();
+               renderSwipeModes();
+            };
+            actions.appendChild(resSel);
+
+            var del = makeDelBtn('删', function () {
+               SWIPE_DEVICES.splice(idx, 1);
+               var sel = document.getElementById('swipe_active_device');
+               var active = parseInt(sel.value) || 0;
+               if (active >= SWIPE_DEVICES.length && SWIPE_DEVICES.length > 0) {
+                  sel.value = String(SWIPE_DEVICES.length - 1); sel.dataset.idx = sel.value;
+               }
+               renderDevices();
+            });
+            del.className = 'del'; del.title = '删除此设备';
+            del.addEventListener('click', function (e) { e.stopPropagation(); }, false);
+            actions.appendChild(del);
+
+            sum.appendChild(nameSpan);
+            sum.appendChild(actions);
+            det.appendChild(sum);
+
+            var body = document.createElement('div'); body.className = 'body';
+
+            var nameField = document.createElement('div'); nameField.className = 'swipe-field';
+            var nameLbl = document.createElement('label'); nameLbl.textContent = '设备名称';
+            var nameIn = document.createElement('input'); nameIn.type = 'text'; nameIn.value = dev.name || '';
+            nameIn.oninput = function () {
+               dev.name = nameIn.value;
+               nameSpan.textContent = (isActive ? '● ' : '') + (dev.name || ('设备' + idx));
+               renderActiveDevice();
+            };
+            nameField.appendChild(nameLbl); nameField.appendChild(nameIn);
+            body.appendChild(nameField);
+
+            det.appendChild(body);
+            return det;
+         }
+
+         function addDevice() {
+            SWIPE_DEVICES.push({
+               name: 'Phone' + (SWIPE_DEVICES.length + 1),
+               screen_w: 1080, screen_h: 1920
+            });
+            renderDevices();
+         }
+
+         // 初始化滑屏页
+         (function () {
+            document.getElementById('swipe_mode').value = '%(swipe_mode_idx)d';
+            document.getElementById('swipe_active_device').dataset.idx = '%(swipe_active_device_idx)d';
+            var ad = document.getElementById('swipe_active_device');
+            ad.onchange = function () {
+               this.dataset.idx = this.value;
+               renderDevices();
+               renderSwipeModes();
+            };
+            renderSwipeModes();
+            renderDevices();
+         })();
+
+         function onSwipeCurrentChange() {
+            var ad = document.getElementById('swipe_active_device');
+            if (ad) { ad.dataset.idx = ad.value; renderDevices(); }
+            renderSwipeModes();
+         }
+
+         // 局部保存：仅提交对应卡片的字段
+         function saveSwipePartial(section) {
+            var payload = {};
+            var btn = document.getElementById('swipe-save-' + section);
+            if (btn) { btn.disabled = true; btn.textContent = '保存中...'; }
+            if (section === 'current') {
+               payload.swipe = {
+                  mode_idx: parseInt(document.getElementById('swipe_mode').value),
+                  active_device_idx: parseInt(document.getElementById('swipe_active_device').value)
+               };
+            } else if (section === 'modes') {
+               payload.swipe = { modes: SWIPE_MODES };
+            } else if (section === 'devices') {
+               payload.swipe = {
+                  devices: SWIPE_DEVICES,
+                  active_device_idx: parseInt(document.getElementById('swipe_active_device').value)
+               };
+            } else {
+               if (btn) { btn.disabled = false; btn.textContent = '保存本卡'; }
+               return;
+            }
+            fetch('/api/config', {
+               method: 'POST', headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify(payload)
+            }).then(function (r) {
+               if (!r.ok) { return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ': ' + t); }); }
+               return r.json();
+            }).then(function (j) {
+               var ok = !!j.ok;
+               var msg = (typeof j.msg === 'string' && j.msg) ? j.msg : (ok ? '已保存' : '保存失败');
+               showToast(msg, ok);
+               if (ok) {
+                  fetch('/api/config').then(function (r) { return r.json(); }).then(function (cfg) {
+                     var sw = cfg.swipe || {};
+                     if (section === 'modes' && Array.isArray(sw.modes) && sw.modes.length === 4) {
+                        SWIPE_MODES = sw.modes; renderSwipeModes();
+                     }
+                     if (section === 'devices' && Array.isArray(sw.devices)) {
+                        SWIPE_DEVICES = sw.devices;
+                        var sel = document.getElementById('swipe_active_device');
+                        if (sel) sel.dataset.idx = String(sw.active_device_idx || 0);
+                        renderDevices();
+                     }
+                     if (section === 'current') {
+                        if (typeof sw.mode_idx === 'number') {
+                           document.getElementById('swipe_mode').value = String(sw.mode_idx);
+                        }
+                        if (typeof sw.active_device_idx === 'number') {
+                           var sel = document.getElementById('swipe_active_device');
+                           if (sel) { sel.dataset.idx = String(sw.active_device_idx); renderDevices(); }
+                        }
+                     }
+                  }).catch(function (e) { console.error('refresh config failed:', e); });
+               }
+            }).catch(function (e) {
+               showToast('错误: ' + escapeHtml(String(e)), false);
+               console.error('partial save failed:', e);
+            }).then(function () {
+               if (btn) { btn.disabled = false; btn.textContent = '保存本卡'; }
+            });
+         }
+
+         // ============ Save ============
+         function collectKeys() {
+            var out = {};
+            Object.keys(KEYS).forEach(function (prov) {
+               out[prov] = [];
+               KEYS[prov].forEach(function (it) {
+                  var k = (it.key || '').trim();
+                  if (!k) return;
+                  var idx = out[prov].length + 1;
+                  out[prov].push({ label: (it.label || '').trim() || (prov + '-' + idx), key: k });
+               });
+            });
+            // ai_token 已迁移到「项目」页签
+            return out;
+         }
+
+         function showToast(msg, ok) {
+            var t = document.getElementById('toast');
+            t.className = ok ? 'ok' : 'error';
+            msg = (msg == null ? '' : String(msg));
+            t.textContent = (ok ? '✓ ' : '✗ ') + msg;
+            t.classList.add('show');
+            if (showToast._t) clearTimeout(showToast._t);
+            showToast._t = setTimeout(function () { t.classList.remove('show'); }, 2400);
+         }
+
+         function save() {
+            var w = [];
+            document.querySelectorAll('.wifi-row').forEach(function (r) {
+               var inputs = r.getElementsByTagName('input');
+               if (inputs[0].value.trim()) w.push({ ssid: inputs[0].value, password: inputs[1].value });
+            });
+            var d = {
+               wifi: w,
+               api_keys: collectKeys(),
+               api_keys_hidden: KEYS_HIDDEN.filter(function (p) { return !!KEYS[p]; }),
+               brightness: parseInt(document.getElementById('brightness').value),
+               http_port: parseInt(document.getElementById('http_port').value),
+               swipe: {
+                  mode_idx: parseInt(document.getElementById('swipe_mode').value),
+                  active_device_idx: parseInt(document.getElementById('swipe_active_device').value),
+                  modes: SWIPE_MODES,
+                  devices: SWIPE_DEVICES
+               },
+               weather: {
+                  api_key: document.getElementById('weather_api_key').value.trim(),
+                  city: document.getElementById('weather_city').value
+               }
+            };
+            var btn = document.getElementById('save-btn');
+            btn.disabled = true; btn.textContent = '保存中...';
+            fetch('/api/config', {
+               method: 'POST', headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify(d)
+            }).then(function (r) {
+               if (!r.ok) {
+                  return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ': ' + t); });
+               }
+               return r.json();
+            }).then(function (j) {
+               btn.disabled = false; btn.textContent = '保存';
+               var ok = !!j.ok;
+               var msg = (typeof j.msg === 'string' && j.msg) ? j.msg : (ok ? '保存成功' : '保存失败');
+               showToast(msg, ok);
+               if (ok) {
+                  // 保存成功后重新拉取完整配置，避免 POST 只返回 ok/changed 导致页签被清空
+                  fetch('/api/config').then(function (r) {
+                     if (!r.ok) {
+                        return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ': ' + t); });
+                     }
+                     return r.json();
+                  }).then(function (cfg) {
+                     var synced = {};
+                     Object.keys(cfg.api_keys || {}).forEach(function (prov) {
+                        if (prov === 'ai_token') return;
+                        if (Array.isArray(cfg.api_keys[prov])) synced[prov] = cfg.api_keys[prov];
+                     });
+                     KEYS = synced;
+                     if (Array.isArray(cfg.api_keys_hidden)) {
+                        KEYS_HIDDEN = cfg.api_keys_hidden.filter(function (p) {
+                           return typeof p === 'string' && !!synced[p];
+                        });
+                     }
+                     renderKeyGroups();
+                     // 同步滑屏配置（服务器校验/迁移后可能与本地略有不同）
+                     var sw = cfg.swipe || {};
+                     if (Array.isArray(sw.modes) && sw.modes.length === 4) {
+                        SWIPE_MODES = sw.modes;
+                        renderSwipeModes();
+                     }
+                     if (Array.isArray(sw.devices)) {
+                        SWIPE_DEVICES = sw.devices;
+                        document.getElementById('swipe_active_device').dataset.idx = String(sw.active_device_idx || 0);
+                        renderDevices();
+                     }
+                     if (typeof sw.mode_idx === 'number') {
+                        document.getElementById('swipe_mode').value = String(sw.mode_idx);
+                     }
+                     // 同步天气全局变量
+                     var wc = cfg.weather || {};
+                     WEATHER_API_KEY = wc.api_key || '';
+                     WEATHER_CITY = wc.city || '';
+                     setTimeout(loadCurrentWeather, 300);
+                  }).catch(function (e) {
+                     showToast('刷新配置失败: ' + escapeHtml(String(e)), false);
+                     console.error('refresh config failed:', e);
+                  });
+               }
+            }).catch(function (e) {
+               btn.disabled = false; btn.textContent = '保存';
+               showToast('错误: ' + escapeHtml(String(e)), false);
+               console.error('save failed:', e);
+            });
+         }
+
+         // ============ System: 同步设备时间 (固定北京时间 UTC+8) ============
+         function syncTime() {
+            var btn = document.getElementById('sync-time-btn');
+            if (btn) btn.disabled = true;
+            fetch('/api/time', { method: 'POST' }).then(function (r) {
+               if (!r.ok) {
+                  return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ': ' + t); });
+               }
+               return r.json();
+            }).then(function (j) {
+               if (btn) btn.disabled = false;
+               showToast(j.msg || '同步完成', !!j.ok);
+            }).catch(function (e) {
+               if (btn) btn.disabled = false;
+               showToast('同步失败: ' + escapeHtml(String(e)), false);
+               console.error('sync time failed:', e);
+            });
+         }
+
+         // ============ Weather: 加载城市列表 / 初始化表单 ============
+         function initWeatherForm() {
+            // 填充 API key
+            var keyInp = document.getElementById('weather_api_key');
+            if (keyInp) keyInp.value = WEATHER_API_KEY || '';
+            // 填充城市下拉
+            var citySel = document.getElementById('weather_city');
+            if (citySel) {
+               citySel.innerHTML = '';
+               if (!Array.isArray(WEATHER_CITIES)) {
+                  var opt = document.createElement('option');
+                  opt.value = ''; opt.textContent = '(无城市列表)';
+                  citySel.appendChild(opt);
+               } else {
+                  // 按 province 分组
+                  var grouped = {};
+                  WEATHER_CITIES.forEach(function (c) {
+                     var p = c.province || '其他';
+                     if (!grouped[p]) grouped[p] = [];
+                     grouped[p].push(c);
+                  });
+                  Object.keys(grouped).forEach(function (p) {
+                     var og = document.createElement('optgroup');
+                     og.label = p;
+                     grouped[p].forEach(function (c) {
+                        var opt = document.createElement('option');
+                        opt.value = c.id;
+                        opt.textContent = c.id + ' (' + c.name + ')';
+                        opt.dataset.name = c.name;
+                        og.appendChild(opt);
+                     });
+                     citySel.appendChild(og);
+                  });
+               }
+               // 选中当前城市
+               if (WEATHER_CITY) {
+                  var found = false;
+                  [].slice.call(citySel.options).forEach(function (o) {
+                     if (o.value === WEATHER_CITY) { found = true; }
+                  });
+                  if (found) citySel.value = WEATHER_CITY;
+                  else {
+                     var opt = document.createElement('option');
+                     opt.value = WEATHER_CITY;
+                     opt.textContent = WEATHER_CITY + ' (自定义)';
+                     citySel.insertBefore(opt, citySel.firstChild);
+                     citySel.value = WEATHER_CITY;
+                  }
+               }
+               updateCityInfo();
+               citySel.onchange = updateCityInfo;
+            }
+            // 拉取当前天气
+            loadCurrentWeather();
+         }
+
+         function updateCityInfo() {
+            var sel = document.getElementById('weather_city');
+            var info = document.getElementById('weather_city_info');
+            if (!sel || !info) return;
+            var opt = sel.options[sel.selectedIndex];
+            if (opt && opt.dataset && opt.dataset.name) {
+               info.textContent = '拼音: ' + opt.dataset.name;
+            } else {
+               info.textContent = '';
+            }
+         }
+
+         function loadCurrentWeather() {
+            var box = document.getElementById('weather-current');
+            if (!box) return;
+            box.textContent = '加载中...';
+            fetch('/api/weather').then(function (r) {
+               if (!r.ok) throw new Error('HTTP ' + r.status);
+               return r.json();
+            }).then(function (j) {
+               if (!j.ok) { box.textContent = '加载失败: ' + (j.error || '未知错误'); return; }
+               var cur = j.current || {};
+               // 时间戳: 优先用 last_update (心知API返回的本地时间字符串), 其次 ts
+               var ts = '--';
+               if (cur.last_update) {
+                  ts = cur.last_update;
+               } else if (cur.ts && cur.ts > 1577836800000) { // 早于 2020-01-01 视为RTC未校准
+                  try { ts = new Date(cur.ts).toLocaleString(); } catch (e) { ts = '--'; }
+               }
+               var parts = [];
+               parts.push('城市: ' + (cur.city || '--'));
+               parts.push('天气: ' + (cur.text || '--'));
+               if (cur.temp != null) parts.push('温度: ' + cur.temp + '°C');
+               if (cur.humidity != null) parts.push('湿度: ' + cur.humidity + '%%');
+               else parts.push('湿度: --');
+               parts.push('AQI: ' + (cur.aqi_label || '--') + (cur.aqi != null ? ' (' + cur.aqi + ')' : ''));
+               parts.push('紫外线: ' + (cur.uv_label || '--') + (cur.uv != null ? ' (' + cur.uv + ')' : ''));
+               parts.push('来源: ' + (cur.source || '--'));
+               parts.push('更新: ' + ts);
+               box.innerHTML = parts.join(' &nbsp;|&nbsp; ');
+            }).catch(function (e) {
+               box.textContent = '加载失败: ' + escapeHtml(String(e));
+               console.error('load weather failed:', e);
+            });
+         }
+
+         function refreshWeatherNow() {
+            var box = document.getElementById('weather-current');
+            if (box) box.textContent = '刷新中...';
+            fetch('/api/weather', {
+               method: 'POST', headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ refresh: true })
+            }).then(function (r) {
+               if (!r.ok) throw new Error('HTTP ' + r.status);
+               return r.json();
+            }).then(function () {
+               loadCurrentWeather();
+               showToast('已请求刷新天气', true);
+            }).catch(function (e) {
+               if (box) box.textContent = '刷新失败: ' + escapeHtml(String(e));
+               showToast('刷新失败', false);
+               console.error('refresh weather failed:', e);
+            });
+         }
+
+         // 页面加载后初始化天气表单
+         if (document.getElementById('weather_city')) {
+            try { initWeatherForm(); } catch (e) { console.error('initWeatherForm:', e); }
+         }
+
+         // ============ Balance ============
+         function fmtAmt(b) {
+            if (b === null || b === undefined) return { text: '--', cls: 'err' };
+            var n = Number(b);
+            if (isNaN(n)) return { text: '--', cls: 'err' };
+            var s = (n < 0 ? '-' : '') + Math.abs(Math.trunc(n)) + '.' +
+               ('0' + Math.round((Math.abs(n) - Math.trunc(Math.abs(n))) * 100)).slice(-2);
+            var cls = 'ok'; if (n < 1) cls = 'danger'; else if (n < 10) cls = 'warn';
+            return { text: s, cls: cls };
+         }
+         function renderBalance(items) {
+            var box = document.getElementById('bal-list');
+            box.innerHTML = '';
+            if (!items || items.length === 0) {
+               var e = document.createElement('div'); e.className = 'empty';
+               e.textContent = '未配置 Key 或已全部停用，先到上方分组添加/开启';
+               box.appendChild(e); return;
+            }
+            items.forEach(function (it) {
+               var card = document.createElement('div'); card.className = 'bcard';
+               var left = document.createElement('div'); left.className = 'left';
+               var lbl = document.createElement('span'); lbl.className = 'lbl';
+               lbl.textContent = it.label || '(未命名)';
+               var prov = document.createElement('span'); prov.className = 'prov';
+               var dot = document.createElement('span'); dot.className = 'prov-dot';
+               dot.style.background = provMeta(it.provider || it.name).color;
+               prov.appendChild(dot);
+               prov.appendChild(document.createTextNode(it.name || it.provider || ''));
+               left.appendChild(lbl); left.appendChild(prov);
+               var right = document.createElement('div'); right.className = 'right';
+               var a = fmtAmt(it.balance);
+               var amt = document.createElement('span'); amt.className = 'amt ' + a.cls;
+               amt.textContent = a.text;
+               var st = document.createElement('span'); st.className = 'st';
+               st.textContent = it.status === 'ok' ? '正常' : (it.msg || it.status || '失败');
+               right.appendChild(amt); right.appendChild(st);
+               card.appendChild(left); card.appendChild(right);
+               box.appendChild(card);
+            });
+         }
+         function refreshBalance() {
+            var btn = document.getElementById('bal-refresh-btn');
+            if (btn) btn.disabled = true;
+            var box = document.getElementById('bal-list');
+            box.innerHTML = '<div class="empty">加载中...</div>';
+            fetch('/api/balance').then(function (r) { return r.json(); }).then(function (j) {
+               if (btn) btn.disabled = false;
+               renderBalance(j.items || []);
+            }).catch(function (e) {
+               if (btn) btn.disabled = false;
+               box.innerHTML = '<div class="empty">\u2717 ' + escapeHtml(String(e)) + '</div>';
+            });
+         }
+
+         // ============ 项目页签 ============
+         var SELF_MEDIA_CATEGORIES = [
+            { v: 'douyin', t: '抖音' },
+            { v: 'kuaishou', t: '快手' },
+            { v: 'xiaohongshu', t: '小红书' },
+            { v: 'bilibili', t: 'bilibili' }
+         ];
+
+         function makeCategorySelect(selected) {
+            var sel = document.createElement('select');
+            SELF_MEDIA_CATEGORIES.forEach(function (c) {
+               var opt = document.createElement('option');
+               opt.value = c.v; opt.textContent = c.t;
+               if (c.v === selected) opt.selected = true;
+               sel.appendChild(opt);
+            });
+            return sel;
+         }
+
+         /* 未保存修改跟踪: 编辑输入即时高亮保存按钮, 删除/保存后清除 */
+         var PROJ_DIRTY = { self_media: false, own_sites: false };
+
+         function setProjectDirty(section, dirty) {
+            PROJ_DIRTY[section] = dirty;
+            var btn = document.getElementById('proj-save-' + section.replace('_', '-'));
+            if (!btn) return;
+            if (dirty) {
+               btn.classList.add('dirty');
+               btn.textContent = '保存更改 ●';
+            } else {
+               btn.classList.remove('dirty');
+               btn.textContent = '保存本卡';
+            }
+         }
+
+         window.addEventListener('beforeunload', function (e) {
+            if (PROJ_DIRTY.self_media || PROJ_DIRTY.own_sites) {
+               e.preventDefault();
+               e.returnValue = '';
+            }
+         });
+
+         function updateProjCounts() {
+            var sm = document.getElementById('proj-sm-count');
+            var os = document.getElementById('proj-os-count');
+            if (sm) sm.textContent = (PROJ_SELF_MEDIA || []).length;
+            if (os) os.textContent = (PROJ_OWN_SITES || []).length;
+         }
+
+         /* 空状态: 直接提供添加按钮, 不再只提示"点击右上角 +" */
+         function renderProjEmpty(box, text, addFn) {
+            var d = document.createElement('div');
+            d.className = 'proj-empty';
+            d.textContent = text;
+            d.appendChild(document.createElement('br'));
+            var b = document.createElement('button');
+            b.type = 'button'; b.className = 'add-btn'; b.textContent = '+ 立即添加';
+            b.onclick = addFn;
+            d.appendChild(b);
+            box.appendChild(d);
+         }
+
+         /* 新增条目后: 展开并滚动到位, 聚焦第一个输入框 */
+         function focusNewCard(box) {
+            var last = box.lastElementChild;
+            if (!last) return;
+            if (last.tagName === 'DETAILS') last.open = true;
+            last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            var firstInput = last.querySelector('input, select');
+            if (firstInput) firstInput.focus();
+         }
+
+         /* 通用测试行: 通过设备代理 GET 接口并显示结果; expectFields 用于校验期望字段 */
+         function makeProjTestRow(getApi, getKey, expectFields, rightEl) {
+            var row = document.createElement('div');
+            row.style.cssText = 'display:flex;align-items:flex-start;gap:8px;margin-top:2px;';
+            var btn = document.createElement('button');
+            btn.type = 'button'; btn.className = 'add-btn'; btn.textContent = '测试连接';
+            btn.style.cssText = 'flex:0 0 auto;';
+            var out = document.createElement('div');
+            out.className = 'proj-test-out';
+            btn.onclick = function () {
+               var api = (getApi() || '').trim();
+               if (!api) {
+                  out.textContent = '✗ 请先填写接口地址';
+                  out.className = 'proj-test-out bad';
+                  return;
+               }
+               btn.disabled = true; btn.textContent = '测试中...';
+               out.textContent = '请求中...'; out.className = 'proj-test-out';
+               fetch('/api/test_wwwsite', {
+                  method: 'POST', headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ api: api, key: getKey() || '' })
+               }).then(function (r) { return r.json(); }).then(function (res) {
+                  btn.disabled = false; btn.textContent = '测试连接';
+                  if (!res.ok) {
+                     out.textContent = '✗ ' + (res.msg || ('HTTP ' + res.status));
+                     out.className = 'proj-test-out bad';
+                     return;
+                  }
+                  var lines = ['✓ HTTP ' + res.status];
+                  var warn = false;
+                  if (expectFields && expectFields.length) {
+                     var data = null;
+                     try { data = JSON.parse((res.body || '').replace(/\.\.\.$/, '')); } catch (e) { }
+                     if (data && typeof data === 'object' && !Array.isArray(data)) {
+                        var missing = [];
+                        expectFields.forEach(function (f) {
+                           if (data[f] === undefined) missing.push(f);
+                           else lines.push(f + ': ' + data[f]);
+                        });
+                        if (missing.length) { lines.push('⚠ 缺少字段: ' + missing.join(', ')); warn = true; }
+                     } else {
+                        lines.push('⚠ 返回内容不是 JSON 对象');
+                        warn = true;
+                     }
+                  }
+                  out.textContent = lines.join('\n');
+                  out.className = 'proj-test-out ' + (warn ? '' : 'ok');
+               }).catch(function (e) {
+                  btn.disabled = false; btn.textContent = '测试连接';
+                  out.textContent = '✗ ' + String(e);
+                  out.className = 'proj-test-out bad';
+               });
+            };
+            row.appendChild(btn); row.appendChild(out);
+            if (rightEl) { rightEl.style.marginLeft = 'auto'; row.appendChild(rightEl); }
+            return row;
+         }
+
+         function makeSelfMediaRow(it, idx) {
+            var det = document.createElement('details');
+            det.className = 'device-card';
+            var sum = document.createElement('summary');
+            var left = document.createElement('span');
+            function sumText() {
+               var catLabel = it.category || '';
+               SELF_MEDIA_CATEGORIES.forEach(function (c) { if (c.v === catLabel) catLabel = c.t; });
+               return (it.name || ('账号' + (idx + 1))) + (catLabel ? ' · ' + catLabel : '');
+            }
+            left.textContent = sumText();
+            sum.appendChild(left);
+            det.appendChild(sum);
+
+            var body = document.createElement('div'); body.className = 'body';
+            var catField = document.createElement('div'); catField.className = 'swipe-field';
+            var catLbl = document.createElement('label'); catLbl.textContent = '类别';
+            var catSel = makeCategorySelect(it.category || 'douyin');
+            catSel.onchange = function () {
+               it.category = catSel.value;
+               left.textContent = sumText();
+               setProjectDirty('self_media', true);
+            };
+            catField.appendChild(catLbl); catField.appendChild(catSel);
+
+            var nameField = document.createElement('div'); nameField.className = 'swipe-field';
+            var nameLbl = document.createElement('label'); nameLbl.textContent = '名称';
+            var nameIn = document.createElement('input'); nameIn.type = 'text';
+            nameIn.value = it.name || ''; nameIn.placeholder = '账号名';
+            nameIn.oninput = function () {
+               it.name = nameIn.value;
+               left.textContent = sumText();
+               setProjectDirty('self_media', true);
+            };
+            nameField.appendChild(nameLbl); nameField.appendChild(nameIn);
+
+            var row2 = document.createElement('div'); row2.className = 'swipe-row2';
+            row2.appendChild(catField); row2.appendChild(nameField);
+            body.appendChild(row2);
+
+            var urlField = document.createElement('div'); urlField.className = 'swipe-field';
+            var urlLbl = document.createElement('label'); urlLbl.textContent = '数据接口 URL';
+            var urlIn = document.createElement('input'); urlIn.type = 'text';
+            urlIn.value = it.url || ''; urlIn.placeholder = 'https://...';
+            urlIn.oninput = function () {
+               it.url = urlIn.value;
+               setProjectDirty('self_media', true);
+            };
+            urlField.appendChild(urlLbl); urlField.appendChild(urlIn);
+            body.appendChild(urlField);
+
+            var del = makeDelBtn('删', function () {
+               PROJ_SELF_MEDIA.splice(idx, 1); renderSelfMedia();
+               saveProjectPartial('self_media');
+            });
+            del.className = 'prov-del'; del.title = '删除此条目';
+            del.addEventListener('click', function (e) { e.stopPropagation(); }, false);
+
+            body.appendChild(makeProjTestRow(
+               function () { return it.url; },
+               function () { return ''; },
+               ['fans', 'works', 'likes', 'views'],
+               del
+            ));
+
+            det.appendChild(body);
+            return det;
+         }
+
+         function renderSelfMedia() {
+            var box = document.getElementById('proj-self-media');
+            box.innerHTML = '';
+            if (!PROJ_SELF_MEDIA || PROJ_SELF_MEDIA.length === 0) {
+               renderProjEmpty(box, '暂无自媒体账号', addSelfMedia);
+               updateProjCounts(); return;
+            }
+            PROJ_SELF_MEDIA.forEach(function (it, idx) {
+               box.appendChild(makeSelfMediaRow(it, idx));
+            });
+            updateProjCounts();
+         }
+
+         function addSelfMedia() {
+            PROJ_SELF_MEDIA.push({ category: 'douyin', name: '', url: '' });
+            renderSelfMedia();
+            focusNewCard(document.getElementById('proj-self-media'));
+            setProjectDirty('self_media', true);
+         }
+
+         function makeOwnSiteRow(it, idx) {
+            var det = document.createElement('details');
+            det.className = 'device-card';
+            var sum = document.createElement('summary');
+            var left = document.createElement('span');
+            left.textContent = it.name || ('网站' + (idx + 1));
+            sum.appendChild(left);
+            det.appendChild(sum);
+
+            var body = document.createElement('div'); body.className = 'body';
+            function field(label, key, placeholder, onInput) {
+               var f = document.createElement('div'); f.className = 'swipe-field';
+               var l = document.createElement('label'); l.textContent = label;
+               var i = document.createElement('input'); i.type = 'text';
+               i.value = it[key] || ''; i.placeholder = placeholder || '';
+               i.oninput = function () {
+                  onInput(i.value);
+                  setProjectDirty('own_sites', true);
+               };
+               f.appendChild(l); f.appendChild(i);
+               return f;
+            }
+            body.appendChild(field('名称', 'name', '网站名', function (v) { it.name = v; left.textContent = v || ('网站' + (idx + 1)); }));
+            body.appendChild(field('API', 'api', 'https://api.example.com/...', function (v) { it.api = v; }));
+            body.appendChild(field('Key', 'key', 'API key / secret', function (v) { it.key = v; }));
+
+            var del = makeDelBtn('删', function () {
+               PROJ_OWN_SITES.splice(idx, 1); renderOwnSites();
+               saveProjectPartial('own_sites');
+            });
+            del.className = 'prov-del'; del.title = '删除此条目';
+            del.addEventListener('click', function (e) { e.stopPropagation(); }, false);
+
+            body.appendChild(makeProjTestRow(
+               function () { return it.api; },
+               function () { return it.key; },
+               null,
+               del
+            ));
+            det.appendChild(body);
+            return det;
+         }
+
+         function renderOwnSites() {
+            var box = document.getElementById('proj-own-sites');
+            box.innerHTML = '';
+            if (!PROJ_OWN_SITES || PROJ_OWN_SITES.length === 0) {
+               renderProjEmpty(box, '暂无自有网站', addOwnSite);
+               updateProjCounts(); return;
+            }
+            PROJ_OWN_SITES.forEach(function (it, idx) {
+               box.appendChild(makeOwnSiteRow(it, idx));
+            });
+            updateProjCounts();
+         }
+
+         function addOwnSite() {
+            PROJ_OWN_SITES.push({ name: '', api: '', key: '' });
+            renderOwnSites();
+            focusNewCard(document.getElementById('proj-own-sites'));
+            setProjectDirty('own_sites', true);
+         }
+
+         function renderProject() {
+            var sn = document.getElementById('proj_device_sn');
+            if (sn) { sn.value = DEVICE_SN || ''; }
+            renderSelfMedia();
+            renderOwnSites();
+         }
+
+         function copyDeviceSn(btn) {
+            var el = document.getElementById('proj_device_sn');
+            if (!el || !el.value) { showToast('SN 尚未生成', false); return; }
+            function done(ok) {
+               showToast(ok ? '已复制' : '复制失败', ok);
+               if (btn && ok) {
+                  btn.textContent = '已复制 ✓';
+                  setTimeout(function () { btn.textContent = '复制'; }, 1500);
+               }
+            }
+            function fallback() {
+               el.select(); el.setSelectionRange(0, 99999);
+               try { document.execCommand('copy'); done(true); }
+               catch (e) { done(false); }
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+               navigator.clipboard.writeText(el.value).then(
+                  function () { done(true); },
+                  function () { fallback(); }
+               );
+            } else { fallback(); }
+         }
+
+         function saveProjectPartial(section) {
+            var payload = { project: {} };
+            var btn = document.getElementById('proj-save-' + section.replace('_', '-'));
+            if (btn) { btn.disabled = true; btn.textContent = '保存中...'; }
+            if (section === 'self_media') {
+               payload.project.self_media = PROJ_SELF_MEDIA;
+            } else if (section === 'own_sites') {
+               payload.project.own_sites = PROJ_OWN_SITES;
+            } else {
+               if (btn) { btn.disabled = false; btn.textContent = '保存本卡'; }
+               return;
+            }
+            fetch('/api/config', {
+               method: 'POST', headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify(payload)
+            }).then(function (r) {
+               if (!r.ok) { return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ': ' + t); }); }
+               return r.json();
+            }).then(function (j) {
+               var ok = !!j.ok;
+               var msg = (typeof j.msg === 'string' && j.msg) ? j.msg : (ok ? '已保存' : '保存失败');
+               showToast(msg, ok);
+               if (ok) {
+                  setProjectDirty(section, false);
+                  fetch('/api/config').then(function (r) { return r.json(); }).then(function (cfg) {
+                     var p = cfg.project || {};
+                     if (typeof p.device_sn === 'string') { DEVICE_SN = p.device_sn; var t = document.getElementById('proj_device_sn'); if (t) t.value = p.device_sn; }
+                     if (Array.isArray(p.self_media)) { PROJ_SELF_MEDIA = p.self_media; renderSelfMedia(); }
+                     if (Array.isArray(p.own_sites)) { PROJ_OWN_SITES = p.own_sites; renderOwnSites(); }
+                  }).catch(function (e) { console.error('refresh project failed:', e); });
+               }
+            }).catch(function (e) {
+               showToast('错误: ' + escapeHtml(String(e)), false);
+               console.error('partial save failed:', e);
+            }).then(function () {
+               if (btn) { btn.disabled = false; }
+               setProjectDirty(section, PROJ_DIRTY[section]);
+            });
+         }
+
+         renderProject();
+
+         // ============ 股票 ============
+         function saveStockConfig() {
+            var btn = document.getElementById('stock-save-config');
+            if (btn) { btn.disabled = true; btn.textContent = '保存中...'; }
+            var ep = (document.getElementById('stock_endpoint').value || '').trim()
+               || 'http://www.mooview.cn/api/';
+            var key = (document.getElementById('stock_api_key').value || '').trim();
+            var payload = { stock: { endpoint: ep, api_key: key } };
+            fetch('/api/config', {
+               method: 'POST', headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify(payload)
+            }).then(function (r) {
+               if (!r.ok) { return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ': ' + t); }); }
+               return r.json();
+            }).then(function (j) {
+               showToast(j.ok ? '已保存' : '保存失败', !!j.ok);
+               if (j.ok) {
+                  STOCK_ENDPOINT = ep; STOCK_API_KEY = key;
+               }
+            }).catch(function (e) {
+               showToast('错误: ' + escapeHtml(String(e)), false);
+            }).then(function () {
+               if (btn) { btn.disabled = false; btn.textContent = '保存配置'; }
+            });
+         }
+
+         // ============ 云服务 (闲沐盒子云平台) ============
+         function cloudStateText(s) {
+            var map = { active: '已激活', binding: '待绑定', unconfigured: '未配置密钥',
+               no_time: '等待校时(NTP)', disabled: '已停用', inactive: '未激活', error: '状态异常' };
+            return map[s] || s || '未知';
+         }
+
+         function refreshCloudStatus() {
+            var box = document.getElementById('cloud-status');
+            if (!box) return;
+            box.textContent = '加载中...';
+            fetch('/api/cloud').then(function (r) { return r.json(); }).then(function (st) {
+               var lines = [];
+               var stateLine = '状态: ' + cloudStateText(st.state);
+               if (st.err_code) {
+                  stateLine += ' (错误码 ' + st.err_code + (st.err_msg ? ' ' + st.err_msg : '') + ')';
+               }
+               lines.push(stateLine);
+               lines.push('型号: ' + (st.model || '-') + '   固件: ' + (st.fw_version || '-'));
+               lines.push('心跳间隔: ' + (st.interval || '-') + 's   上次心跳: ' + (st.last_hb || '--'));
+               if (st.pending_code) {
+                  lines.push('设备激活码: ' + st.pending_code +
+                     ' (5 分钟内在平台「我的设备」回填, 亦可到设备端 本机设置-云端激活 查看)');
+               }
+               box.innerHTML = lines.map(escapeHtml).join('<br>');
+            }).catch(function (e) {
+               box.textContent = '获取失败: ' + e;
+            });
+         }
+
+         function saveCloudConfig() {
+            var btn = document.getElementById('cloud-save-config');
+            if (btn) { btn.disabled = true; btn.textContent = '保存中...'; }
+            var payload = { cloud: {
+               enabled: document.getElementById('cloud_enabled').value === '1'
+            } };
+            fetch('/api/config', {
+               method: 'POST', headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify(payload)
+            }).then(function (r) {
+               if (!r.ok) { return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ': ' + t); }); }
+               return r.json();
+            }).then(function (j) {
+               showToast(j.ok ? '已保存' : ('保存失败: ' + (j.msg || '')), !!j.ok);
+               refreshCloudStatus();
+            }).catch(function (e) {
+               showToast('错误: ' + escapeHtml(String(e)), false);
+            }).then(function () {
+               if (btn) { btn.disabled = false; btn.textContent = '保存开关'; }
+            });
+         }
+
+         // ============ 云端数据源 (注册表 + 逐源探测) ============
+         var CLOUD_SOURCES = [];
+         var CLOUD_SRC_STATE = {};
+
+         function cloudSrcMeta(state) {
+            var map = {
+               idle: ['未检测', 'var(--faint)'],
+               ok: ['正常', 'var(--ok)'],
+               stale: ['数据过期', 'var(--warn)'],
+               network: ['网络失败', 'var(--err)'],
+               unconfigured: ['云服务未启用', 'var(--warn)'],
+               unbound: ['设备未绑定', 'var(--warn)'],
+               unsubscribed: ['未订阅', 'var(--warn)'],
+               missing: ['源不存在', 'var(--err)'],
+               disabled: ['源已停用', 'var(--err)'],
+               nodata: ['暂无数据', 'var(--warn)'],
+               ratelimited: ['限流中', 'var(--warn)'],
+               unknown: ['未登记', 'var(--muted)'],
+               error: ['探测失败', 'var(--err)']
+            };
+            var m = map[state] || ['未知', 'var(--muted)'];
+            return { text: m[0], color: m[1] };
+         }
+
+         function renderCloudSources() {
+            var box = document.getElementById('cloud-source-list');
+            if (!box) return;
+            box.classList.remove('hint');
+            if (!CLOUD_SOURCES.length) {
+               box.classList.add('hint');
+               box.textContent = '固件未登记任何数据源';
+               return;
+            }
+            box.innerHTML = '';
+            CLOUD_SOURCES.forEach(function (s) {
+               var r = CLOUD_SRC_STATE[s.code];
+               var meta = cloudSrcMeta(r ? r.state : 'idle');
+               var row = document.createElement('div');
+               row.className = 'cloud-src-row';
+               var name = document.createElement('div');
+               name.className = 'cloud-src-name';
+               name.textContent = s.name;
+               var codeEl = document.createElement('span');
+               codeEl.className = 'mono';
+               codeEl.textContent = s.code;
+               name.appendChild(codeEl);
+               var right = document.createElement('div');
+               right.className = 'cloud-src-right';
+               var badge = document.createElement('span');
+               badge.className = 'cloud-src-badge';
+               badge.style.color = meta.color;
+               badge.textContent = meta.text;
+               var btn = document.createElement('button');
+               btn.type = 'button';
+               btn.className = 'add-btn btn-neutral';
+               btn.dataset.code = s.code;
+               btn.textContent = '检测';
+               btn.onclick = function () {
+                  probeCloudSource(s.code, btn);
+               };
+               right.appendChild(badge);
+               right.appendChild(btn);
+               row.appendChild(name);
+               row.appendChild(right);
+               var det = document.createElement('div');
+               det.className = 'cloud-src-detail';
+               det.textContent = (r && r.detail) ? r.detail : '';
+               det.style.display = det.textContent ? '' : 'none';
+               row.appendChild(det);
+               box.appendChild(row);
+            });
+         }
+
+         function probeCloudSource(code, btn, done) {
+            var box = document.getElementById('cloud-source-list');
+            if (!btn && box) {
+               btn = box.querySelector('button[data-code="' + code + '"]');
+            }
+            var row = null;
+            if (btn) {
+               row = btn.closest('.cloud-src-row');
+               btn.disabled = true;
+               btn.textContent = '检测中';
+            }
+            if (row) {
+               var b = row.querySelector('.cloud-src-badge');
+               if (b) {
+                  b.classList.add('is-busy');
+                  b.style.color = 'var(--muted)';
+                  b.textContent = '检测中';
+               }
+            }
+            fetch('/api/cloud/probe', {
+               method: 'POST', headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ code: code })
+            }).then(function (r) { return r.json(); }).then(function (j) {
+               CLOUD_SRC_STATE[code] = (j && j.result) ||
+                  { code: code, name: '', state: 'error', state_text: '无结果', detail: '' };
+               renderCloudSources();
+            }).catch(function (e) {
+               CLOUD_SRC_STATE[code] = { code: code, name: '', state: 'error',
+                  state_text: '请求失败', detail: String(e) };
+               renderCloudSources();
+            }).then(function () {
+               if (done) done();
+            });
+         }
+
+         function probeAllCloudSources() {
+            var btn = document.getElementById('cloud-src-probe-all');
+            if (btn) { btn.disabled = true; btn.textContent = '刷新中'; }
+            /* 先拉一次平台数据源清单 (阻塞请求, 失败沿用现有清单), 再逐源探测 */
+            fetch('/api/cloud/sources?refresh=1').then(function (r) {
+               return r.json();
+            }).then(function (j) {
+               if (j && j.ok && j.sources && j.sources.length) {
+                  CLOUD_SOURCES = j.sources;
+               }
+               renderCloudSources();
+            }).catch(function () {
+            }).then(function () {
+               if (btn) btn.textContent = '检测中';
+               var codes = CLOUD_SOURCES.map(function (s) { return s.code; });
+               var i = 0;
+               (function next() {
+                  if (i >= codes.length) {
+                     renderCloudSources();
+                     if (btn) { btn.disabled = false; btn.innerHTML = '&#x21bb; 全部检测'; }
+                     showToast('数据源检测完成', true);
+                     return;
+                  }
+                  probeCloudSource(codes[i], null, function () {
+                     i++;
+                     setTimeout(next, 200);
+                  });
+               })();
+            });
+         }
+
+         function loadCloudSources() {
+            var box = document.getElementById('cloud-source-list');
+            if (!box) return;
+            fetch('/api/cloud/sources').then(function (r) {
+               return r.json();
+            }).then(function (j) {
+               CLOUD_SOURCES = (j && j.sources) || [];
+               renderCloudSources();
+            }).catch(function () {
+               box.textContent = '数据源清单获取失败';
+            });
+         }
+
+         (function initCloud() {
+            var sel = document.getElementById('cloud_enabled');
+            if (sel) sel.value = CLOUD_ENABLED ? '1' : '0';
+            var sysSn = document.getElementById('sys_sn');
+            if (sysSn) sysSn.value = DEVICE_SN || '';
+            refreshCloudStatus();
+            loadCloudSources();
+         })();
+
+         // ============ 闹钟 (网络时钟, 3 组) ============
+         var DAY_NAMES = ['日', '一', '二', '三', '四', '五', '六'];
+
+         function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+         function fillTimeSelect(sel, max, cur) {
+            for (var i = 0; i <= max; i++) {
+               var opt = document.createElement('option');
+               opt.value = i; opt.textContent = pad2(i);
+               if (i === cur) opt.selected = true;
+               sel.appendChild(opt);
+            }
+         }
+
+         function renderAlarms() {
+            var box = document.getElementById('alarm-list');
+            box.innerHTML = '';
+            ALARMS.forEach(function (a, idx) {
+               var days = a.days || [];
+               var row = document.createElement('div');
+               row.className = 'alarm-row'
+                  + (days.length === 0 ? ' is-once' : '')
+                  + (a.en ? '' : ' off');
+               row.dataset.idx = idx;
+
+               // 头行: 开关 + 名称 + 右侧时间
+               var head = document.createElement('div');
+               head.className = 'alarm-head';
+               var sw = document.createElement('label');
+               sw.className = 'switch';
+               var en = document.createElement('input');
+               en.type = 'checkbox'; en.checked = !!a.en; en.id = 'alarm-en-' + idx;
+               var slider = document.createElement('span');
+               slider.className = 'slider';
+               sw.appendChild(en); sw.appendChild(slider);
+               var lbl = document.createElement('span');
+               lbl.className = 'alarm-name';
+               lbl.textContent = '闹钟 ' + (idx + 1);
+               en.onchange = function () { row.classList.toggle('off', !en.checked); };
+               var time = document.createElement('div');
+               time.className = 'alarm-time';
+               var hs = document.createElement('select'); hs.id = 'alarm-h-' + idx;
+               fillTimeSelect(hs, 23, a.h || 0);
+               var colon = document.createElement('span');
+               colon.className = 'colon'; colon.textContent = ':';
+               var ms = document.createElement('select'); ms.id = 'alarm-m-' + idx;
+               fillTimeSelect(ms, 59, a.m || 0);
+               time.appendChild(hs); time.appendChild(colon); time.appendChild(ms);
+               head.appendChild(sw); head.appendChild(lbl); head.appendChild(time);
+               row.appendChild(head);
+
+               // 提醒文字 (响铃时替换 ALARM 大字显示, 最多 16 字 = 2 行)
+               var msg = document.createElement('input');
+               msg.type = 'text';
+               msg.className = 'alarm-msg';
+               msg.id = 'alarm-msg-' + idx;
+               msg.maxLength = 16;
+               msg.placeholder = '提醒文字 (可选, 最多 16 字, 响铃时显示)';
+               msg.value = a.msg || '';
+               row.appendChild(msg);
+
+               // 星期行: 7 天均分 + 单次快捷键
+               var daysBox = document.createElement('div');
+               daysBox.className = 'alarm-days';
+               DAY_NAMES.forEach(function (nm, d) {
+                  var b = document.createElement('button');
+                  b.type = 'button'; b.className = 'day-btn';
+                  b.textContent = nm;
+                  if (days.indexOf(d) !== -1) b.classList.add('active');
+                  b.onclick = function () {
+                     b.classList.toggle('active');
+                     row.classList.toggle('is-once',
+                        row.querySelectorAll('.day-btn.active').length === 0);
+                  };
+                  daysBox.appendChild(b);
+               });
+               var once = document.createElement('button');
+               once.type = 'button';
+               once.className = 'day-btn day-once';
+               once.textContent = '单次';
+               once.title = '不选星期 = 单次闹钟, 触发一次后自动关闭';
+               once.onclick = function () {
+                  row.querySelectorAll('.day-btn.active').forEach(function (x) {
+                     x.classList.remove('active');
+                  });
+                  row.classList.add('is-once');
+               };
+               daysBox.appendChild(once);
+               row.appendChild(daysBox);
+               box.appendChild(row);
+            });
+         }
+
+         function saveAlarms() {
+            var btn = document.getElementById('alarm-save-btn');
+            if (btn) { btn.disabled = true; btn.textContent = '保存中...'; }
+            var payload = [];
+            document.querySelectorAll('#alarm-list .alarm-row').forEach(function (row) {
+               var days = [];
+               row.querySelectorAll('.day-btn.active').forEach(function (b) {
+                  if (!b.classList.contains('day-once')) {
+                     days.push(DAY_NAMES.indexOf(b.textContent));
+                  }
+               });
+               days.sort(function (x, y) { return x - y; });
+               payload.push({
+                  en: document.getElementById('alarm-en-' + row.dataset.idx).checked,
+                  h: parseInt(document.getElementById('alarm-h-' + row.dataset.idx).value, 10),
+                  m: parseInt(document.getElementById('alarm-m-' + row.dataset.idx).value, 10),
+                  days: days,
+                  msg: (document.getElementById('alarm-msg-' + row.dataset.idx).value || '')
+                     .trim().slice(0, 16)
+               });
+            });
+            fetch('/api/config', {
+               method: 'POST', headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ alarms: payload })
+            }).then(function (r) {
+               if (!r.ok) { return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ': ' + t); }); }
+               return r.json();
+            }).then(function (j) {
+               if (j.ok) {
+                  ALARMS = payload;
+                  var st = [];
+                  payload.forEach(function (a, i) {
+                     st.push('闹钟' + (i + 1) + ' ' + (a.en ? '开' : '关'));
+                  });
+                  showToast('已保存: ' + st.join(' / '), true);
+               } else {
+                  showToast('保存失败', false);
+               }
+            }).catch(function (e) {
+               showToast('错误: ' + escapeHtml(String(e)), false);
+            }).then(function () {
+               if (btn) { btn.disabled = false; btn.textContent = '保存闹钟'; }
+            });
+         }
+         renderAlarms();
+
+         // ============ 整点新闻播报 (v1.5) ============
+         function renderNewsHours() {
+            var box = document.getElementById('news-hours');
+            if (!box) return;
+            box.innerHTML = '';
+            for (var h = 7; h <= 22; h++) { /* 0~6/23 点已去除, 平台档期 9~22 */
+               (function (h) {
+                  var b = document.createElement('button');
+                  b.type = 'button';
+                  b.className = 'hour-chip'
+                     + (NEWS_HOURS.indexOf(h) >= 0 ? ' active' : '')
+                     + (h < 9 || h > 22 ? ' dim' : '');
+                  b.textContent = String(h);
+                  b.title = (h < 10 ? '0' + h : '' + h) + ':00'
+                     + (h < 9 || h > 22 ? '（平台无此档期）' : '');
+                  b.onclick = function () { b.classList.toggle('active'); };
+                  box.appendChild(b);
+               })(h);
+            }
+            var sw = document.getElementById('news_enabled_sw');
+            if (sw) sw.checked = !!NEWS_ENABLED;
+         }
+
+         function collectNewsHours() {
+            var hours = [];
+            document.querySelectorAll('#news-hours .hour-chip.active').forEach(function (b) {
+               var h = parseInt(b.textContent, 10);
+               if (h >= 0 && h <= 23 && hours.indexOf(h) < 0) hours.push(h);
+            });
+            hours.sort(function (x, y) { return x - y; });
+            return hours;
+         }
+
+         function saveNews() {
+            var btn = document.getElementById('news-save-btn');
+            if (btn) { btn.disabled = true; btn.textContent = '保存中...'; }
+            var payload = { news: {
+               enabled: document.getElementById('news_enabled_sw').checked,
+               volume: parseInt(document.getElementById('news_volume').value, 10) || 0,
+               hours: collectNewsHours()
+            } };
+            fetch('/api/config', {
+               method: 'POST', headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify(payload)
+            }).then(function (r) {
+               if (!r.ok) { return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ': ' + t); }); }
+               return r.json();
+            }).then(function (j) {
+               if (j.ok) {
+                  NEWS_HOURS = payload.news.hours;
+                  NEWS_ENABLED = payload.news.enabled;
+                  NEWS_VOLUME = payload.news.volume;
+                  showToast('已保存: ' + (payload.news.enabled ? '自动播报开' : '自动播报关')
+                     + ' / ' + payload.news.hours.length + ' 个档位', true);
+               } else {
+                  showToast('保存失败: ' + (j.msg || ''), false);
+               }
+            }).catch(function (e) {
+               showToast('错误: ' + escapeHtml(String(e)), false);
+            }).then(function () {
+               if (btn) { btn.disabled = false; btn.textContent = '保存设置'; }
+            });
+         }
+
+         function fetchNewsPreview() {
+            var btn = document.getElementById('news-fetch-btn');
+            var box = document.getElementById('news-preview');
+            if (btn) { btn.disabled = true; btn.textContent = '获取中...'; }
+            if (box) box.innerHTML = '<div class="np-meta">正在拉取当档数据 (约 1~10s)...</div>';
+            fetch('/api/news/preview').then(function (r) { return r.json(); }).then(function (j) {
+               if (!j || !j.ok) {
+                  box.innerHTML = '<div class="np-meta">\u2717 获取失败: '
+                     + escapeHtml((j && j.msg) || '未知错误') + '</div>';
+                  return;
+               }
+               var r = j.result || {};
+               var html = '';
+               html += '<div class="np-meta">档期 <b>' + escapeHtml(r.hour_label || '-')
+                  + '</b> / 预计时长 ' + (r.duration_est_sec || 0) + 's'
+                  + (r.script_url ? ' / <a href="' + escapeHtml(r.script_url)
+                     + '" target="_blank" rel="noopener">播报稿</a>' : '') + '</div>';
+               if (Array.isArray(r.items) && r.items.length) {
+                  html += '<ol>' + r.items.map(function (t) {
+                     return '<li>' + escapeHtml(t) + '</li>';
+                  }).join('') + '</ol>';
+               } else {
+                  html += '<div class="np-meta">当档暂无标题</div>';
+               }
+               if (r.wav_url) {
+                  html += '<audio controls preload="none" src="'
+                     + escapeHtml(r.wav_url) + '"></audio>';
+                  html += '<div class="np-meta">试听为平台原始 WAV（24kHz 单声道，浏览器直连）；'
+                     + 'WAV 未上线时无法播放属预期，文字与播报稿仍可核对。</div>';
+               } else {
+                  html += '<div class="np-meta">当档未解析到 WAV 地址（audio_url 非 .wav 且无法按约定推断），无法试听。</div>';
+               }
+               if (r.source_name) {
+                  html += '<div class="np-meta">' + escapeHtml(r.source_name) + '</div>';
+               }
+               box.innerHTML = html;
+               showToast('获取成功: ' + (r.hour_label || '') + ' '
+                  + ((r.items && r.items.length) || 0) + ' 条', true);
+            }).catch(function (e) {
+               box.innerHTML = '<div class="np-meta">\u2717 错误: '
+                  + escapeHtml(String(e)) + '</div>';
+            }).then(function () {
+               if (btn) { btn.disabled = false; btn.textContent = '\u2913 立即获取'; }
+            });
+         }
+
+         function playNewsNow() {
+            var btn = document.getElementById('news-play-btn');
+            if (btn) { btn.disabled = true; btn.textContent = '已触发...'; }
+            fetch('/api/news/play', {
+               method: 'POST', headers: { 'Content-Type': 'application/json' },
+               body: '{}'
+            }).then(function (r) { return r.json(); }).then(function (j) {
+               showToast(j.ok ? '已触发, 设备即将播报' : ('触发失败: ' + (j.msg || '')), !!j.ok);
+            }).catch(function (e) {
+               showToast('错误: ' + escapeHtml(String(e)), false);
+            }).then(function () {
+               if (btn) { btn.disabled = false; btn.textContent = '\u25B6 立即播报'; }
+            });
+         }
+
+         function refreshNewsStatus() {
+            var box = document.getElementById('news-status');
+            if (!box) return;
+            fetch('/api/news/status').then(function (r) { return r.json(); }).then(function (j) {
+               if (!(j && j.ok)) {
+                  box.textContent = '获取失败';
+                  return;
+               }
+               var r = j.result || {};
+               var lines = [];
+               lines.push('状态: ' + (r.playing ? '播报中' : '空闲')
+                  + ' / 最近: ' + (r.msg || '-') + (r.ts ? (' (' + r.ts + ')') : ''));
+               if (r.hour_label) lines.push('档期: ' + r.hour_label);
+               if (Array.isArray(r.items) && r.items.length) {
+                  lines.push('标题 ' + r.items.length + ' 条: ' + r.items.slice(0, 3).join(' | '));
+               }
+               if (r.source_name) lines.push(r.source_name);
+               box.innerHTML = lines.map(escapeHtml).join('<br>');
+            }).catch(function (e) {
+               box.textContent = '获取失败: ' + e;
+            });
+         }
+         renderNewsHours();
+         refreshNewsStatus();
+
+         function testStockConnection() {
+            var btn = document.getElementById('stock-test-btn');
+            if (btn) { btn.disabled = true; btn.textContent = '测试中...'; }
+            fetch('/api/stock?action=user').then(function (r) { return r.json(); }).then(function (j) {
+               if (j && j.ok && j.data) {
+                  showToast('连接成功: ' + (j.data.username || '(匿名)'), true);
+               } else {
+                  showToast('连接失败: ' + ((j && j.message) || '未知错误'), false);
+               }
+            }).catch(function (e) {
+               showToast('网络错误: ' + escapeHtml(String(e)), false);
+            }).then(function () {
+               if (btn) { btn.disabled = false; btn.textContent = '测试连接'; }
+            });
+         }
+
+         function refreshStock() {
+            var box = document.getElementById('stock-holdings');
+            if (!box) return;
+            box.innerHTML = '<div class="empty">加载中...</div>';
+            fetch('/api/stock?action=user').then(function (r) { return r.json(); }).then(function (j) {
+               if (!(j && j.ok)) {
+                  box.innerHTML = '<div class="empty">\u2717 ' + escapeHtml((j && j.message) || '加载失败') + '</div>';
+                  return;
+               }
+               renderStockHoldings(j.data || {}, box);
+            }).catch(function (e) {
+               box.innerHTML = '<div class="empty">\u2717 ' + escapeHtml(String(e)) + '</div>';
+            });
+         }
+
+         function renderStockHoldings(data, box) {
+            box = box || document.getElementById('stock-holdings');
+            if (!box) return;
+            box.innerHTML = '';
+            var kxBox = document.getElementById('stock-kxian');
+            if (kxBox) kxBox.innerHTML = '';
+            var hd = Array.isArray(data.holdings) ? data.holdings : [];
+            if (data.username) {
+               var t = document.createElement('div'); t.className = 'hint';
+               t.textContent = '用户: ' + data.username; box.appendChild(t);
+            }
+            if (hd.length === 0) {
+               var e = document.createElement('div'); e.className = 'empty';
+               e.textContent = '当前用户无持仓';
+               box.appendChild(e); return;
+            }
+            hd.forEach(function (h) {
+               var card = document.createElement('div'); card.className = 'stock-holding-card';
+               card.style.cursor = 'pointer';
+               card.title = '点击查看 K 线';
+               var code = h.stock_code || '';
+               card.onclick = function () { if (code) clickStockKxian(code, h.stock_name || ''); };
+               var left = document.createElement('div');
+               var nm = document.createElement('div'); nm.className = 'l-name';
+               nm.textContent = (h.stock_name || '(未命名)') + (code ? ' \u00b7 ' + code : '');
+               left.appendChild(nm);
+               var sub = document.createElement('div'); sub.className = 'l-sub';
+               var qty = Number(h.quantity) || 0;
+               var cost = Number(h.cost_price) || 0;
+               sub.textContent = '持股 ' + qty + '  成本 Y' + cost.toFixed(2);
+               left.appendChild(sub);
+               var right = document.createElement('div');
+               var price = document.createElement('div'); price.className = 'r-price';
+               price.textContent = 'Y' + (Number(h.market_price) || 0).toFixed(2);
+               right.appendChild(price);
+               var pl = document.createElement('div'); pl.className = 'r-pl';
+               var profit = Number(h.profit) || 0;
+               var pct = Number(h.profit_pct) || 0;
+               var sign = profit >= 0 ? '+' : '';
+               pl.textContent = sign + profit.toFixed(2) + ' (' + sign + pct.toFixed(2) + '%%)';
+               if (pct >= 1) pl.className = 'r-pl ok';
+               else if (pct <= -1) pl.className = 'r-pl danger';
+               else pl.className = 'r-pl warn';
+               right.appendChild(pl);
+               card.appendChild(left); card.appendChild(right);
+               box.appendChild(card);
+            });
+         }
+
+         function clickStockKxian(code, name) {
+            var box = document.getElementById('stock-kxian');
+            if (!box) return;
+            box.innerHTML = '<div class="empty">加载 ' + escapeHtml(code) + ' K 线中...</div>';
+            fetch('/api/stock?action=kxian&code=' + encodeURIComponent(code))
+               .then(function (r) { return r.json(); })
+               .then(function (j) {
+                  if (!(j && j.ok)) {
+                     box.innerHTML = '<div class="empty">\u2717 ' + escapeHtml((j && j.message) || '加载失败') + '</div>';
+                     return;
+                  }
+                  renderKxian(j.data || {}, box);
+               })
+               .catch(function (e) {
+                  box.innerHTML = '<div class="empty">\u2717 ' + escapeHtml(String(e)) + '</div>';
+               });
+         }
+
+         function renderKxian(data, box) {
+            box.innerHTML = '';
+            var t = document.createElement('div'); t.className = 'hint';
+            t.textContent = (data.stock_name || '') + ' (' + (data.stock_code || '') + ')  K 线 + AI 预测';
+            box.appendChild(t);
+            function buildTable(title, rows, cls) {
+               if (!rows || rows.length === 0) return;
+               var h = document.createElement('div'); h.className = 'hint';
+               h.style.marginTop = '6px'; h.textContent = title; box.appendChild(h);
+               var tb = document.createElement('table'); tb.className = 'kxian-tb ' + cls;
+               var thead = document.createElement('thead');
+               thead.innerHTML = '<tr><th>日期</th><th>开</th><th>收</th><th>高</th><th>低</th><th>量</th></tr>';
+               tb.appendChild(thead);
+               var tbdy = document.createElement('tbody');
+               rows.forEach(function (r) {
+                  var tr = document.createElement('tr');
+                  function td(v) { var c = document.createElement('td'); c.textContent = v; return c; }
+                  tr.appendChild(td(r.trade_date || ''));
+                  tr.appendChild(td(Number(r.open || 0).toFixed(2)));
+                  tr.appendChild(td(Number(r.close || 0).toFixed(2)));
+                  tr.appendChild(td(Number(r.high || 0).toFixed(2)));
+                  tr.appendChild(td(Number(r.low || 0).toFixed(2)));
+                  tr.appendChild(td(r.volume || 0));
+                  if (Number(r.close || 0) >= Number(r.open || 0)) tr.className = 'k-up';
+                  else tr.className = 'k-dn';
+                  tbdy.appendChild(tr);
+               });
+               tb.appendChild(tbdy); box.appendChild(tb);
+            }
+            buildTable('历史 (' + (data.history ? data.history.length : 0) + ' 条)', data.history, 'history');
+            buildTable('AI 预测 (' + (data.forecast ? data.forecast.length : 0) + ' 条)', data.forecast, 'forecast');
+         }
+      </script>
+   </div>
+</body>
+
+</html>
