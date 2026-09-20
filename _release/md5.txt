@@ -1,3 +1,0 @@
-b854cf6f86d8e075a47ae1ad9c0937ef *firmware-mp3dec.bin
-c1573b12bc8f1b0a0eb1e77ea7e84ba3 *firmware-romfont.bin
-1c0ffa86e0327abb84879e674ecb60be *device-files.zip
