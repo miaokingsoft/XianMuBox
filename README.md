@@ -205,3 +205,8 @@ python tools/fast_push.py COM5 device-files /
 - 云平台相关功能默认不可用（见[第六节](#六功能可用性一览)）
 - ESP32-S3-Zero 为小众板卡，换板需对照 [接线总表](docs/完整接线总表.md) 重排引脚（引脚档案在 `device-files/devices/`）
 - 部署/升级会覆盖设备端 `settings.json`，先备份后部署
+
+## 闲沐工坊
+- MiaoKing
+- QQ：7740840
+- Email：bjonline@qq.com
