@@ -150,6 +150,7 @@ python tools/fast_push.py COM5 device-files /
 - PCB 制板与焊接说明：[docs/PCB制板与焊接说明.md](docs/PCB制板与焊接说明.md)（三板架构详解 + 嘉立创免费打样入口）
 - PCB 源文件：`PCB/XianMuBoxv3.0_2026-09-20.epro2`（嘉立创 EDA 专业版工程）
 - 接线对照：[docs/完整接线总表.md](docs/完整接线总表.md)、[docs/esp32s3zero引脚说明.md](docs/esp32s3zero引脚说明.md)
+- 盒子外壳：[3D打印源文件](https://makerworld.com.cn/zh/models/2912792-xian-mu-he-zi-1-54cun-cai-ping-zhuo-mian-xin-xi-zh#profileId-3413525)
 
 ## 九、目录结构
 
@@ -187,22 +188,21 @@ python tools/fast_push.py COM5 device-files /
 
 > 每个功能都有一份对应的功能文档，从按键表到数据来源逐项写清。想加一个新功能：照着模板写一个插件放进 `modes/`、在菜单登记一行即可，不会牵一发动全身。
 
-### 附：AI 全流程开发 Skill（`.agents/skills/xianmubox-dev/`）
+### 附：AI 全流程开发 Skill（`skills/xianmubox-dev/`）
 
 本仓附带一个 **Agent Skill 包**——写给 AI 编程工具看的「项目操作手册」：`SKILL.md` 主手册 + 三份参考（工具链命令速查、编码规则与模式插件契约、设备调试指南）。支持 Agent Skills 的 AI 编程工具（ZCode、Claude Code 等）打开本仓库时会自动发现并加载它——相当于给 AI 配了一位熟悉本项目全部约定的老手。
 
 **它固化了什么**
 
 - **六阶段工作流**：需求梳理 → 方案制定 → 实施开发 → 设备调试 → 上传部署 → 文档收尾，每阶段有硬门禁：方案未批不写码、测试不绿不构建、未备份设备配置不部署。
-- **四条红线**：UI 先仿真后烧录 · `tools/test.py` 全绿 · 文档同批同步 · 命令行提交——不熟悉本项目的协作者也不会跳步。
 
 **怎么用**：用这类 AI 编程工具打开仓库，直接用自然语言提需求即可，AI 会按手册推进。例如——
 
-- 「给盒子加一个番茄钟模式」→ 先确认按键与数据源，方案获批后才动手写码
+- 「给盒子加一个贪吃游戏模式」→ 先确认按键与数据源，方案获批后才动手写码
 - 「新闻模式真机没声音，查一下」→ 自动选对硬件诊断手段定位根因，不盲改代码
 - 「把当前代码推到设备」→ 先备份设备 `settings.json`，再构建、快推
 
-**适用边界**：手册里的构建 / 仿真 / 静态测试命令面向完整源码工程（`src/` + `tools/` 构建链，本仓未发布该工程）；其中**部署部分**——`tools/fast_push.py` 单连接推送与设备连接要点——配合本仓 `device-files/` 即可直接照做。不用 AI 工具，它也是一份透明了解本项目开发方法的说明书；细节见 [SKILL.md](.agents/skills/xianmubox-dev/SKILL.md)。
+**适用边界**：手册里的构建 / 仿真 / 静态测试命令面向完整源码工程（`src/` + `tools/` 构建链，本仓未发布该工程）；其中**部署部分**——`tools/fast_push.py` 单连接推送与设备连接要点——配合本仓 `device-files/` 即可直接照做。不用 AI 工具，它也是一份透明了解本项目开发方法的说明书；细节见 [SKILL.md](skills/xianmubox-dev/SKILL.md)。
 
 ## 十一、第三方组件与素材授权
 
@@ -214,8 +214,6 @@ python tools/fast_push.py COM5 device-files /
 | 全量汉字点阵（hanzi_24/romfont） | 由 **阿里妈妈方圆体**（AlimamaFangYuanTiVF-Thin）渲染生成，遵循[阿里妈妈字体免费商用授权](https://fonts.alibabagroup.com/) |
 | 摩斯电码模式 | 移植自网络开源项目，原始作者信息不详 |
 | 部分点阵字库（sy_32x32 / hanzi1k / duanyu24 等） | 来源不详的历史素材 |
-
-> 「摩斯电码」模式与来源不明的字体系历史遗留素材，若原作者主张权利，请联系即删。其余代码、文档与 UI 素材以 [CC BY-NC 4.0](LICENSE) 授权。
 
 ## 十二、已知限制
 
