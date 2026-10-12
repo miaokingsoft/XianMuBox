@@ -1,3 +1,4 @@
+
 # 闲沐盒子 XianMuBox
 
 > **别人的桌面摆件只能看时间，你的这块屏——播你的新闻、盯你的股票、放你的电台、还能给你讲故事。**
@@ -11,7 +12,9 @@
 > 授权：[CC BY-NC 4.0](LICENSE)——可自由使用、修改、再分发（须署名），**禁止商用**。
 
 ---
+<img width="800"  alt="Gemini_Generated_Image_25w3sg25w3sg25w3" src="https://github.com/user-attachments/assets/5a9bb3ef-488c-4f2d-bb5e-a20fc49d99b7" />
 
+---
 ## 一、它是什么
 
 市面上的桌面小屏不少，大多数只能看时间。闲沐盒子想做的事更具体一点：**把你散在手机各个 App 里的信息，收拢到桌前一屏。**
